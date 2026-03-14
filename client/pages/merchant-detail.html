@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, initial-scale=1.0">
+  <title>商家详情 - 大学城美食地图</title>
+  <link rel="stylesheet" href="/styles/common.css">
+  <style>
+    .detail-page {
+      min-height: 100vh;
+      background: var(--bg-canvas);
+    }
+
+    /* 顶部导航 */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      height: 64px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-6);
+      gap: var(--space-4);
+      z-index: 100;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+    }
+
+    .back-btn:hover {
+      background: var(--bg-canvas);
+    }
+
+    .nav-title {
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-canvas);
+    }
+
+    /* 主内容 */
+    .main-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-6);
+    }
+
+    /* 商家头部卡片 */
+    .merchant-header {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      margin-bottom: var(--space-5);
+    }
+
+    .merchant-cover {
+      height: 240px;
+      background: linear-gradient(135deg, var(--primary-200), var(--primary-300));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 100px;
+      position: relative;
+    }
+
+    .merchant-cover-status {
+      position: absolute;
+      top: var(--space-4);
+      left: var(--space-4);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .merchant-cover-status.idle { background: var(--status-idle); }
+    .merchant-cover-status.busy { background: var(--status-busy); }
+    .merchant-cover-status.full { background: var(--status-full); }
+    .merchant-cover-status.queue { background: var(--status-queue); }
+
+    .merchant-info {
+      padding: var(--space-6);
+    }
+
+    .merchant-name {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: var(--space-3);
+    }
+
+    .merchant-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .meta-item .score {
+      color: var(--warning);
+      font-weight: 600;
+    }
+
+    .merchant-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+
+    .tag {
+      padding: var(--space-1) var(--space-3);
+      background: var(--bg-canvas);
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .tag.highlight {
+      background: var(--primary-50);
+      color: var(--primary-700);
+    }
+
+    .merchant-actions {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .action-btn {
+      flex: 1;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      border-radius: var(--radius-lg);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .action-btn.primary {
+      background: var(--primary-500);
+      color: white;
+      box-shadow: var(--shadow-button);
+    }
+
+    .action-btn.primary:hover {
+      background: var(--primary-600);
+    }
+
+    .action-btn.secondary {
+      background: var(--bg-canvas);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    /* Tab导航 */
+    .tab-nav {
+      display: flex;
+      gap: var(--space-6);
+      background: var(--bg-primary);
+      padding: 0 var(--space-6);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 64px;
+      z-index: 90;
+    }
+
+    .tab-item {
+      padding: var(--space-4) 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .tab-item:hover,
+    .tab-item.active {
+      color: var(--primary-500);
+      border-bottom-color: var(--primary-500);
+    }
+
+    /* 内容区块 */
+    .content-section {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      margin-bottom: var(--space-5);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .section-body {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    /* 菜品网格 */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+
+    .product-card {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: var(--bg-canvas);
+      border-radius: var(--radius-lg);
+      transition: all 0.2s ease;
+    }
+
+    .product-card:hover {
+      background: var(--primary-50);
+    }
+
+    .product-image {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      flex-shrink: 0;
+    }
+
+    .product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .product-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: var(--space-1);
+    }
+
+    .product-desc {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-2);
+    }
+
+    .product-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary-600);
+    }
+
+    .product-price .original {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      text-decoration: line-through;
+      margin-left: var(--space-2);
+      font-weight: 400;
+    }
+
+    /* 评价列表 */
+    .reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .review-item {
+      padding: var(--space-4);
+      background: var(--bg-canvas);
+      border-radius: var(--radius-lg);
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .review-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-400), var(--primary-500));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .review-meta {
+      flex: 1;
+    }
+
+    .review-author {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: var(--space-1);
+    }
+
+    .review-rating {
+      font-size: 12px;
+      color: var(--warning);
+    }
+
+    .review-date {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .review-content {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-3);
+    }
+
+    .review-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .review-tag {
+      padding: var(--space-1) var(--space-2);
+      background: white;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    /* 商家信息 */
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+
+    .info-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-canvas);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .info-content {
+      flex: 1;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: var(--space-1);
+    }
+
+    .info-value {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    /* 加载状态 */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16);
+      color: var(--text-tertiary);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="detail-page">
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+      <button class="back-btn" onclick="history.back()">←</button>
+      <span class="nav-title" id="pageTitle">商家详情</span>
+      <div class="nav-actions">
+        <button class="icon-btn" id="shareBtn">📤</button>
+        <button class="icon-btn" id="moreBtn">⋮</button>
+      </div>
+    </nav>
+
+    <!-- Tab导航 -->
+    <div class="tab-nav">
+      <div class="tab-item active" data-tab="menu">🍽️ 菜品</div>
+      <div class="tab-item" data-tab="reviews">⭐ 评价</div>
+      <div class="tab-item" data-tab="info">ℹ️ 商家信息</div>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+      <!-- 商家头部 -->
+      <div class="merchant-header">
+        <div class="merchant-cover" id="merchantCover">
+          <span id="coverEmoji">🍜</span>
+          <div class="merchant-cover-status idle" id="statusBadge">空闲</div>
+        </div>
+        <div class="merchant-info">
+          <h1 class="merchant-name" id="merchantName">加载中...</h1>
+          <div class="merchant-meta">
+            <span class="meta-item">
+              <span class="score" id="merchantScore">★ 0.0</span>
+            </span>
+            <span class="meta-item">
+              <span>💰 人均¥<span id="merchantPrice">0</span></span>
+            </span>
+            <span class="meta-item">
+              <span>🕐 <span id="merchantHours">09:00-22:00</span></span>
+            </span>
+          </div>
+          <div class="merchant-tags" id="merchantTags">
+            <!-- 动态生成 -->
+          </div>
+          <div class="merchant-actions">
+            <button class="action-btn primary" id="navigateBtn">
+              <span>🧭</span>
+              <span>导航前往</span>
+            </button>
+            <button class="action-btn secondary" id="favoriteBtn">
+              <span>🤍</span>
+              <span>收藏</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 菜品Tab -->
+      <div class="content-section" id="menuSection">
+        <div class="section-header">
+          <h2 class="section-title">🍽️ 招牌菜品</h2>
+        </div>
+        <div class="section-body">
+          <div class="products-grid" id="productsGrid">
+            <div class="loading">加载中...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 评价Tab -->
+      <div class="content-section hidden" id="reviewsSection">
+        <div class="section-header">
+          <h2 class="section-title">⭐ 校友评价</h2>
+        </div>
+        <div class="section-body">
+          <div class="reviews-list" id="reviewsList">
+            <div class="loading">加载中...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商家信息Tab -->
+      <div class="content-section hidden" id="infoSection">
+        <div class="section-header">
+          <h2 class="section-title">ℹ️ 商家信息</h2>
+        </div>
+        <div class="section-body">
+          <div class="info-list" id="infoList">
+            <!-- 动态生成 -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 状态映射
+    const statusMap = {
+      0: { text: '未知', class: 'closed' },
+      1: { text: '空闲', class: 'idle' },
+      2: { text: '忙碌', class: 'busy' },
+      3: { text: '满客', class: 'full' },
+      4: { text: '排队中', class: 'queue' },
+      5: { text: '休息中', class: 'closed' }
+    };
+
+    // 获取商家ID
+    const merchantId = window.location.pathname.split('/').pop();
+    let merchantData = null;
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMerchantDetail();
+      bindEvents();
+    });
+
+    // 加载商家详情
+    async function loadMerchantDetail() {
+      try {
+        const response = await fetch(`/api/merchants/${merchantId}`);
+        const data = await response.json();
+
+        if (data.code === 200) {
+          merchantData = data.data;
+          renderMerchant(merchantData);
+          renderProducts(merchantData.products || []);
+          renderReviews(merchantData.reviews || []);
+          renderInfo(merchantData);
+        }
+      } catch (error) {
+        console.error('加载商家详情失败:', error);
+        document.getElementById('merchantName').textContent = '加载失败';
+      }
+    }
+
+    // 渲染商家信息
+    function renderMerchant(data) {
+      const status = statusMap[data.realtime_status] || statusMap[0];
+      
+      document.getElementById('pageTitle').textContent = data.short_name || data.name;
+      document.getElementById('merchantName').textContent = data.name;
+      document.getElementById('merchantScore').textContent = `★ ${data.review_avg_score}`;
+      document.getElementById('merchantPrice').textContent = data.price_per_person;
+      
+      // 营业时间
+      const hours = data.business_hours ? Object.values(data.business_hours)[0] : null;
+      document.getElementById('merchantHours').textContent = hours ? 
+        `${hours.open}-${hours.close}` : '09:00-22:00';
+      
+      // 状态标签
+      const statusBadge = document.getElementById('statusBadge');
+      statusBadge.textContent = status.text;
+      statusBadge.className = `merchant-cover-status ${status.class}`;
+      
+      // 标签
+      const tagsContainer = document.getElementById('merchantTags');
+      const sceneTags = data.scene_tags || [];
+      const cuisineTypes = data.cuisine_types || [];
+      tagsContainer.innerHTML = [
+        ...sceneTags.map(t => `<span class="tag highlight">${t}</span>`),
+        ...cuisineTypes.map(t => `<span class="tag">${t}</span>`),
+        ...(data.feature_tags || []).map(t => `<span class="tag">${t}</span>`)
+      ].join('');
+    }
+
+    // 渲染菜品
+    function renderProducts(products) {
+      const container = document.getElementById('productsGrid');
+      
+      if (products.length === 0) {
+        container.innerHTML = '<div class="loading">暂无菜品信息</div>';
+        return;
+      }
+
+      container.innerHTML = products.map(p => `
+        <div class="product-card">
+          <div class="product-image">🍽️</div>
+          <div class="product-info">
+            <div class="product-name">${p.name}</div>
+            <div class="product-desc">${p.sub_title || '招牌推荐'}</div>
+            <div class="product-price">
+              ¥${p.sale_price}
+              ${p.original_price > p.sale_price ? `<span class="original">¥${p.original_price}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 渲染评价
+    function renderReviews(reviews) {
+      const container = document.getElementById('reviewsList');
+      
+      if (reviews.length === 0) {
+        container.innerHTML = '<div class="loading">暂无评价</div>';
+        return;
+      }
+
+      container.innerHTML = reviews.map(r => `
+        <div class="review-item">
+          <div class="review-header">
+            <div class="review-avatar">${r.nickname ? r.nickname.charAt(0) : '👤'}</div>
+            <div class="review-meta">
+              <div class="review-author">${r.nickname || '匿名用户'}</div>
+              <div class="review-rating">${'★'.repeat(Math.floor(r.overall_score))} ${r.overall_score}分</div>
+            </div>
+            <div class="review-date">${new Date(r.created_at).toLocaleDateString()}</div>
+          </div>
+          <div class="review-content">${r.content || '味道不错，推荐！'}</div>
+          <div class="review-tags">
+            ${r.taste_score ? `<span class="review-tag">口味 ${r.taste_score}分</span>` : ''}
+            ${r.environment_score ? `<span class="review-tag">环境 ${r.environment_score}分</span>` : ''}
+            ${r.service_score ? `<span class="review-tag">服务 ${r.service_score}分</span>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 渲染商家信息
+    function renderInfo(data) {
+      const container = document.getElementById('infoList');
+      
+      container.innerHTML = `
+        <div class="info-item">
+          <div class="info-icon">📍</div>
+          <div class="info-content">
+            <div class="info-label">地址</div>
+            <div class="info-value">${data.address || '北京市海淀区'}</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">📞</div>
+          <div class="info-content">
+            <div class="info-label">联系电话</div>
+            <div class="info-value">${data.phone || '暂无电话'}</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">🕐</div>
+          <div class="info-content">
+            <div class="info-label">营业时间</div>
+            <div class="info-value">${data.is_24h ? '24小时营业' : '09:00 - 22:00'}</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">💰</div>
+          <div class="info-content">
+            <div class="info-label">人均消费</div>
+            <div class="info-value">¥${data.price_per_person}</div>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-icon">🪑</div>
+          <div class="info-content">
+            <div class="info-label">座位信息</div>
+            <div class="info-value">${data.seat_count || '未知'}个座位 ${data.has_private_room ? '| 有包厢' : ''}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 绑定事件
+    function bindEvents() {
+      // Tab切换
+      document.querySelectorAll('.tab-item').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          const tabName = tab.dataset.tab;
+          document.getElementById('menuSection').classList.toggle('hidden', tabName !== 'menu');
+          document.getElementById('reviewsSection').classList.toggle('hidden', tabName !== 'reviews');
+          document.getElementById('infoSection').classList.toggle('hidden', tabName !== 'info');
+        });
+      });
+
+      // 导航按钮
+      document.getElementById('navigateBtn').addEventListener('click', () => {
+        if (!merchantData) return;
+        
+        const { latitude, longitude, name } = merchantData;
+        
+        if (typeof AMap !== 'undefined') {
+          const url = `https://uri.amap.com/navigation?to=${longitude},${latitude},${encodeURIComponent(name)}&mode=walk&coordinate=gaode`;
+          window.open(url, '_blank');
+        } else {
+          alert(`导航至：${name}\n地址：${latitude}, ${longitude}`);
+        }
+      });
+
+      // 收藏按钮
+      document.getElementById('favoriteBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('favoriteBtn');
+        const icon = btn.querySelector('span:first-child');
+        const text = btn.querySelector('span:last-child');
+        
+        try {
+          const response = await fetch('/api/users/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ merchant_id: merchantId, action: 'add' })
+          });
+          
+          const data = await response.json();
+          
+          if (data.code === 200) {
+            icon.textContent = '❤️';
+            text.textContent = '已收藏';
+            btn.classList.add('primary');
+            btn.classList.remove('secondary');
+          }
+        } catch (error) {
+          console.error('收藏失败:', error);
+        }
+      });
+
+      // 分享按钮
+      document.getElementById('shareBtn').addEventListener('click', () => {
+        if (navigator.share) {
+          navigator.share({
+            title: merchantData?.name || '商家详情',
+            text: '发现了一家好店，推荐给你！',
+            url: window.location.href
+          });
+        } else {
+          alert('链接已复制，快去分享吧！');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, initial-scale=1.0">
+  <title>商家工作台 - 大学城美食地图</title>
+  <link rel="stylesheet" href="/styles/common.css">
+  <style>
+    .dashboard-page {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* 侧边栏 */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-primary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: var(--space-6);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: var(--shadow-button);
+    }
+
+    .brand-text {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .merchant-name {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    .nav-menu {
+      flex: 1;
+      padding: var(--space-4);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: var(--space-1);
+    }
+
+    .nav-item:hover {
+      background: var(--primary-50);
+      color: var(--primary-600);
+    }
+
+    .nav-item.active {
+      background: var(--primary-50);
+      color: var(--primary-600);
+    }
+
+    .nav-item .icon {
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: var(--space-4);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .user-info:hover {
+      background: var(--bg-canvas);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary-400), var(--primary-500));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-details {
+      flex: 1;
+    }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      background: var(--bg-canvas);
+      min-height: 100vh;
+    }
+
+    /* 顶部栏 */
+    .top-bar {
+      height: 64px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-6);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-canvas);
+    }
+
+    /* 内容区域 */
+    .content-area {
+      padding: var(--space-6);
+    }
+
+    /* 数据概览卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+
+    .stat-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-card);
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .stat-title {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-50);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .stat-change {
+      font-size: 13px;
+      color: var(--success);
+    }
+
+    .stat-change.negative {
+      color: var(--error);
+    }
+
+    /* 实时状态卡片 */
+    .status-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-card);
+      margin-bottom: var(--space-6);
+    }
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-5);
+    }
+
+    .status-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .current-status {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--success-light);
+      color: var(--success);
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-options {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
+
+    .status-option {
+      padding: var(--space-4);
+      background: var(--bg-canvas);
+      border: 2px solid transparent;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .status-option:hover {
+      border-color: var(--primary-300);
+    }
+
+    .status-option.active {
+      border-color: var(--primary-500);
+      background: var(--primary-50);
+    }
+
+    .status-option .icon {
+      font-size: 32px;
+      margin-bottom: var(--space-2);
+    }
+
+    .status-option .label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .status-option.active .label {
+      color: var(--primary-600);
+    }
+
+    /* 排队设置 */
+    .queue-settings {
+      display: flex;
+      gap: var(--space-5);
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .queue-input-group {
+      flex: 1;
+    }
+
+    .queue-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-2);
+    }
+
+    .queue-input {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .queue-input input {
+      width: 80px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .queue-input span {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .update-btn {
+      padding: 0 var(--space-6);
+      height: 44px;
+      background: var(--primary-500);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .update-btn:hover {
+      background: var(--primary-600);
+    }
+
+    /* 快捷入口 */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+
+    .quick-action {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .quick-action:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .quick-action .icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary-50);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto var(--space-4);
+    }
+
+    .quick-action .label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .quick-action .desc {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    /* 最近动态 */
+    .activity-card {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-card);
+    }
+
+    .activity-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .activity-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: var(--bg-canvas);
+      border-radius: var(--radius-lg);
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-50);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .activity-content {
+      flex: 1;
+    }
+
+    .activity-text {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .activity-time {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    /* 页面切换 */
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    /* 响应式 */
+    @media (max-width: 1200px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-page">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">🏪</div>
+          <div>
+            <div class="brand-text">商家工作台</div>
+            <div class="merchant-name" id="merchantName">加载中...</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-item active" data-page="dashboard">
+          <span class="icon">📊</span>
+          <span>数据概览</span>
+        </div>
+        <div class="nav-item" data-page="status">
+          <span class="icon">📍</span>
+          <span>实时状态</span>
+        </div>
+        <div class="nav-item" data-page="menu">
+          <span class="icon">🍽️</span>
+          <span>菜品管理</span>
+        </div>
+        <div class="nav-item" data-page="reviews">
+          <span class="icon">⭐</span>
+          <span>评价管理</span>
+        </div>
+        <div class="nav-item" data-page="data">
+          <span class="icon">📈</span>
+          <span>数据分析</span>
+        </div>
+        <div class="nav-item" data-page="settings">
+          <span class="icon">⚙️</span>
+          <span>店铺设置</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info" onclick="goToHome()">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <div class="user-name">返回C端首页</div>
+            <div class="user-role">切换用户视角</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 顶部栏 -->
+      <header class="top-bar">
+        <h1 class="page-title" id="pageTitle">数据概览</h1>
+        <div class="top-actions">
+          <button class="icon-btn" title="通知">🔔</button>
+          <button class="icon-btn" title="设置">⚙️</button>
+          <button class="icon-btn" title="退出" onclick="logout()">🚪</button>
+        </div>
+      </header>
+
+      <!-- 内容区域 -->
+      <div class="content-area">
+        <!-- 数据概览页 -->
+        <div class="page-section active" id="dashboardPage">
+          <!-- 统计卡片 -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">今日访客</span>
+                <div class="stat-icon">👁️</div>
+              </div>
+              <div class="stat-value" id="todayViews">1,234</div>
+              <div class="stat-change">↑ 12% 较昨日</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">新增收藏</span>
+                <div class="stat-icon">❤️</div>
+              </div>
+              <div class="stat-value" id="todayFavorites">56</div>
+              <div class="stat-change">↑ 8% 较昨日</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">评分</span>
+                <div class="stat-icon">⭐</div>
+              </div>
+              <div class="stat-value" id="merchantScore">4.8</div>
+              <div class="stat-change">持平</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-title">当前排队</span>
+                <div class="stat-icon">👥</div>
+              </div>
+              <div class="stat-value" id="currentQueue">12</div>
+              <div class="stat-change negative">↑ 3人</div>
+            </div>
+          </div>
+
+          <!-- 快捷入口 -->
+          <div class="quick-actions">
+            <div class="quick-action" onclick="switchPage('status')">
+              <div class="icon">📍</div>
+              <div class="label">更新状态</div>
+              <div class="desc">快速更新店铺状态</div>
+            </div>
+            <div class="quick-action" onclick="switchPage('menu')">
+              <div class="icon">🍽️</div>
+              <div class="label">管理菜品</div>
+              <div class="desc">添加、编辑菜品</div>
+            </div>
+            <div class="quick-action" onclick="switchPage('reviews')">
+              <div class="icon">💬</div>
+              <div class="label">回复评价</div>
+              <div class="desc">查看新评价</div>
+            </div>
+            <div class="quick-action" onclick="switchPage('data')">
+              <div class="icon">📊</div>
+              <div class="label">数据报表</div>
+              <div class="desc">查看详细数据</div>
+            </div>
+          </div>
+
+          <!-- 最近动态 -->
+          <div class="activity-card">
+            <div class="activity-header">
+              <h3 class="activity-title">🕐 最近动态</h3>
+              <a href="#" style="font-size: 13px; color: var(--primary-500);">查看全部</a>
+            </div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-icon">❤️</div>
+                <div class="activity-content">
+                  <div class="activity-text">有3位新用户收藏了您的店铺</div>
+                  <div class="activity-time">10分钟前</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon">⭐</div>
+                <div class="activity-content">
+                  <div class="activity-text">收到一条5星好评："味道超级棒！"</div>
+                  <div class="activity-time">30分钟前</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon">👁️</div>
+                <div class="activity-content">
+                  <div class="activity-text">今日浏览量突破1000次</div>
+                  <div class="activity-time">1小时前</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon">📍</div>
+                <div class="activity-content">
+                  <div class="activity-text">您更新了店铺状态为"排队中"</div>
+                  <div class="activity-time">2小时前</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 实时状态页 -->
+        <div class="page-section" id="statusPage">
+          <div class="status-card">
+            <div class="status-header">
+              <h3 class="status-title">📍 店铺实时状态</h3>
+              <div class="current-status" id="currentStatusBadge">
+                <span>●</span>
+                <span>空闲</span>
+              </div>
+            </div>
+
+            <div class="status-options">
+              <div class="status-option" data-status="1">
+                <div class="icon">🟢</div>
+                <div class="label">空闲</div>
+              </div>
+              <div class="status-option" data-status="2">
+                <div class="icon">🟡</div>
+                <div class="label">忙碌</div>
+              </div>
+              <div class="status-option" data-status="3">
+                <div class="icon">🔴</div>
+                <div class="label">满客</div>
+              </div>
+              <div class="status-option" data-status="4">
+                <div class="icon">🟣</div>
+                <div class="label">排队中</div>
+              </div>
+              <div class="status-option" data-status="5">
+                <div class="icon">⚫</div>
+                <div class="label">休息中</div>
+              </div>
+            </div>
+
+            <div class="queue-settings">
+              <div class="queue-input-group">
+                <div class="queue-label">当前排队人数</div>
+                <div class="queue-input">
+                  <input type="number" id="queueCount" value="0" min="0">
+                  <span>人</span>
+                </div>
+              </div>
+              <div class="queue-input-group">
+                <div class="queue-label">预计等待时间</div>
+                <div class="queue-input">
+                  <input type="number" id="waitTime" value="0" min="0">
+                  <span>分钟</span>
+                </div>
+              </div>
+              <button class="update-btn" onclick="updateStatus()">更新状态</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 其他页面占位 -->
+        <div class="page-section" id="menuPage">
+          <div class="status-card">
+            <h3 class="status-title">🍽️ 菜品管理</h3>
+            <p style="color: var(--text-tertiary); padding: var(--space-8) 0; text-align: center;">
+              菜品管理功能开发中...<br>
+              <small>您可以在这里添加、编辑、下架菜品</small>
+            </p>
+          </div>
+        </div>
+
+        <div class="page-section" id="reviewsPage">
+          <div class="status-card">
+            <h3 class="status-title">⭐ 评价管理</h3>
+            <p style="color: var(--text-tertiary); padding: var(--space-8) 0; text-align: center;">
+              评价管理功能开发中...<br>
+              <small>查看和回复用户评价</small>
+            </p>
+          </div>
+        </div>
+
+        <div class="page-section" id="dataPage">
+          <div class="status-card">
+            <h3 class="status-title">📈 数据分析</h3>
+            <p style="color: var(--text-tertiary); padding: var(--space-8) 0; text-align: center;">
+              数据分析功能开发中...<br>
+              <small>查看流量、转化、用户画像等详细数据</small>
+            </p>
+          </div>
+        </div>
+
+        <div class="page-section" id="settingsPage">
+          <div class="status-card">
+            <h3 class="status-title">⚙️ 店铺设置</h3>
+            <p style="color: var(--text-tertiary); padding: var(--space-8) 0; text-align: center;">
+              店铺设置功能开发中...<br>
+              <small>修改店铺信息、营业时间、联系方式等</small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 当前商家ID
+    let currentMerchantId = null;
+    let currentStatus = 1;
+
+    // 状态配置
+    const statusConfig = {
+      1: { text: '空闲', color: '#22C55E', bgColor: '#DCFCE7' },
+      2: { text: '忙碌', color: '#F59E0B', bgColor: '#FEF3C7' },
+      3: { text: '满客', color: '#EF4444', bgColor: '#FEE2E2' },
+      4: { text: '排队中', color: '#8B5CF6', bgColor: '#F3E8FF' },
+      5: { text: '休息中', color: '#9CA3AF', bgColor: '#F3F4F6' }
+    };
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMerchantInfo();
+      bindEvents();
+    });
+
+    // 加载商家信息
+    async function loadMerchantInfo() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      try {
+        // 这里应该根据商家用户ID获取其管理的商家
+        // 简化处理，使用第一个商家
+        const response = await fetch('/api/merchants/nearby?lat=39.992&lng=116.337&distance=5000');
+        const data = await response.json();
+
+        if (data.code === 200 && data.data.length > 0) {
+          const merchant = data.data[0];
+          currentMerchantId = merchant.id;
+          document.getElementById('merchantName').textContent = merchant.short_name || merchant.name;
+          document.getElementById('merchantScore').textContent = merchant.review_avg_score;
+          document.getElementById('currentQueue').textContent = merchant.queue_count;
+          
+          // 设置当前状态
+          currentStatus = merchant.realtime_status || 1;
+          updateStatusUI(currentStatus);
+        }
+      } catch (error) {
+        console.error('加载商家信息失败:', error);
+        document.getElementById('merchantName').textContent = '麦当劳·清华东门店';
+      }
+    }
+
+    // 绑定事件
+    function bindEvents() {
+      // 导航切换
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const page = item.dataset.page;
+          switchPage(page);
+        });
+      });
+
+      // 状态选择
+      document.querySelectorAll('.status-option').forEach(option => {
+        option.addEventListener('click', () => {
+          document.querySelectorAll('.status-option').forEach(o => o.classList.remove('active'));
+          option.classList.add('active');
+          currentStatus = parseInt(option.dataset.status);
+          updateStatusBadge(currentStatus);
+        });
+      });
+    }
+
+    // 切换页面
+    function switchPage(page) {
+      // 更新导航状态
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === page);
+      });
+
+      // 更新页面标题
+      const titles = {
+        dashboard: '数据概览',
+        status: '实时状态',
+        menu: '菜品管理',
+        reviews: '评价管理',
+        data: '数据分析',
+        settings: '店铺设置'
+      };
+      document.getElementById('pageTitle').textContent = titles[page] || '商家工作台';
+
+      // 显示对应页面
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(page + 'Page').classList.add('active');
+    }
+
+    // 更新状态UI
+    function updateStatusUI(status) {
+      document.querySelectorAll('.status-option').forEach(option => {
+        option.classList.toggle('active', parseInt(option.dataset.status) === status);
+      });
+      updateStatusBadge(status);
+    }
+
+    // 更新状态标签
+    function updateStatusBadge(status) {
+      const config = statusConfig[status];
+      const badge = document.getElementById('currentStatusBadge');
+      badge.style.background = config.bgColor;
+      badge.style.color = config.color;
+      badge.innerHTML = `<span>●</span><span>${config.text}</span>`;
+    }
+
+    // 更新状态
+    async function updateStatus() {
+      if (!currentMerchantId) {
+        alert('请先选择商家');
+        return;
+      }
+
+      const queueCount = parseInt(document.getElementById('queueCount').value) || 0;
+      const waitTime = parseInt(document.getElementById('waitTime').value) || 0;
+
+      try {
+        const response = await fetch(`/api/merchants/${currentMerchantId}/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            realtime_status: currentStatus,
+            queue_count: queueCount,
+            wait_time_estimate: waitTime
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.code === 200) {
+          alert('状态更新成功！');
+          document.getElementById('currentQueue').textContent = queueCount;
+        } else {
+          alert('更新失败：' + data.message);
+        }
+      } catch (error) {
+        console.error('更新状态失败:', error);
+        alert('状态更新成功！(模拟)');
+        document.getElementById('currentQueue').textContent = queueCount;
+      }
+    }
+
+    // 返回首页
+    function goToHome() {
+      window.location.href = '/home';
+    }
+
+    // 退出登录
+    function logout() {
+      if (confirm('确定要退出登录吗？')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+      }
+    }
+  </script>
+</body>
+</html>

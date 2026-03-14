@@ -1,0 +1,30 @@
+{
+  "name": "campus-food-map",
+  "version": "1.0.0",
+  "description": "大学城美食地图 - Node.js全栈项目",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "nodemon server/app.js",
+    "init-db": "node server/database/init.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.8.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "campus",
+    "food",
+    "map",
+    "university"
+  ],
+  "author": "",
+  "license": "MIT"
+}

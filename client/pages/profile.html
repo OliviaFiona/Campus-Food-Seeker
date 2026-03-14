@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, initial-scale=1.0">
+  <title>个人中心 - 大学城美食地图</title>
+  <link rel="stylesheet" href="/styles/common.css">
+  <style>
+    .profile-page {
+      min-height: 100vh;
+      background: var(--bg-canvas);
+    }
+
+    /* 顶部导航 */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      height: 64px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-6);
+      gap: var(--space-4);
+      z-index: 100;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+    }
+
+    .back-btn:hover {
+      background: var(--bg-canvas);
+    }
+
+    .nav-title {
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .nav-action {
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+    }
+
+    .nav-action:hover {
+      background: var(--bg-canvas);
+      color: var(--primary-500);
+    }
+
+    /* 主内容 */
+    .main-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-6);
+    }
+
+    /* 用户信息卡片 */
+    .user-card {
+      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      color: white;
+      margin-bottom: var(--space-6);
+      box-shadow: var(--shadow-card);
+    }
+
+    .user-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .user-school {
+      font-size: 14px;
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .user-stats {
+      display: flex;
+      gap: var(--space-8);
+      padding-top: var(--space-5);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: var(--space-1);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    /* 功能菜单 */
+    .menu-section {
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      margin-bottom: var(--space-5);
+      overflow: hidden;
+    }
+
+    .menu-header {
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .menu-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .menu-list {
+      padding: var(--space-2) 0;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item:hover {
+      background: var(--bg-canvas);
+    }
+
+    .menu-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-canvas);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .menu-content {
+      flex: 1;
+    }
+
+    .menu-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: var(--space-1);
+    }
+
+    .menu-desc {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .menu-arrow {
+      font-size: 18px;
+      color: var(--text-tertiary);
+    }
+
+    .menu-badge {
+      padding: var(--space-1) var(--space-2);
+      background: var(--error);
+      color: white;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* 收藏列表 */
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-6) var(--space-6);
+    }
+
+    .favorite-card {
+      background: var(--bg-canvas);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .favorite-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .favorite-image {
+      height: 100px;
+      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+
+    .favorite-info {
+      padding: var(--space-3);
+    }
+
+    .favorite-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: var(--space-1);
+    }
+
+    .favorite-meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    /* 空状态 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-10);
+      color: var(--text-tertiary);
+    }
+
+    .empty-icon {
+      font-size: 60px;
+      margin-bottom: var(--space-4);
+      opacity: 0.5;
+    }
+
+    .empty-text {
+      font-size: 14px;
+    }
+
+    /* 退出登录 */
+    .logout-btn {
+      width: 100%;
+      height: 48px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--error);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: var(--space-4);
+    }
+
+    .logout-btn:hover {
+      background: var(--error-light);
+      border-color: var(--error);
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-page">
+    <!-- 顶部导航 -->
+    <nav class="top-nav">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <span class="nav-title">个人中心</span>
+      <span class="nav-action" id="editBtn">编辑资料</span>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+      <!-- 用户信息卡片 -->
+      <div class="user-card">
+        <div class="user-header">
+          <div class="user-avatar" id="userAvatar">👤</div>
+          <div class="user-info">
+            <h1 class="user-name" id="userName">加载中...</h1>
+            <div class="user-school">
+              <span>🎓</span>
+              <span id="userSchool">清华大学</span>
+            </div>
+          </div>
+        </div>
+        <div class="user-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="favoritesCount">0</div>
+            <div class="stat-label">收藏</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="reviewsCount">0</div>
+            <div class="stat-label">评价</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="pointsCount">0</div>
+            <div class="stat-label">积分</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 我的收藏 -->
+      <div class="menu-section">
+        <div class="menu-header">
+          <span class="menu-title">❤️ 我的收藏</span>
+        </div>
+        <div class="favorites-grid" id="favoritesGrid">
+          <div class="empty-state">
+            <div class="empty-icon">🍽️</div>
+            <div class="empty-text">暂无收藏商家</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 功能菜单 -->
+      <div class="menu-section">
+        <div class="menu-header">
+          <span class="menu-title">📋 功能菜单</span>
+        </div>
+        <div class="menu-list">
+          <div class="menu-item" onclick="goToHistory()">
+            <div class="menu-icon">🕐</div>
+            <div class="menu-content">
+              <div class="menu-label">浏览历史</div>
+              <div class="menu-desc">最近查看过的商家</div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item" onclick="goToReviews()">
+            <div class="menu-icon">⭐</div>
+            <div class="menu-content">
+              <div class="menu-label">我的评价</div>
+              <div class="menu-desc">管理我的评价内容</div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item">
+            <div class="menu-icon">🎁</div>
+            <div class="menu-content">
+              <div class="menu-label">积分中心</div>
+              <div class="menu-desc">签到、任务、兑换</div>
+            </div>
+            <span class="menu-badge">NEW</span>
+          </div>
+          <div class="menu-item">
+            <div class="menu-icon">🎫</div>
+            <div class="menu-content">
+              <div class="menu-label">优惠券</div>
+              <div class="menu-desc">我的优惠券包</div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设置菜单 -->
+      <div class="menu-section">
+        <div class="menu-header">
+          <span class="menu-title">⚙️ 设置</span>
+        </div>
+        <div class="menu-list">
+          <div class="menu-item">
+            <div class="menu-icon">🔔</div>
+            <div class="menu-content">
+              <div class="menu-label">消息通知</div>
+              <div class="menu-desc">管理推送通知设置</div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item">
+            <div class="menu-icon">🔒</div>
+            <div class="menu-content">
+              <div class="menu-label">隐私设置</div>
+              <div class="menu-desc">管理个人信息可见性</div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item">
+            <div class="menu-icon">❓</div>
+            <div class="menu-content">
+              <div class="menu-label">帮助与反馈</div>
+              <div class="menu-desc">常见问题、意见反馈</div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </div>
+          <div class="menu-item">
+            <div class="menu-icon">ℹ️</div>
+            <div class="menu-content">
+              <div class="menu-label">关于我们</div>
+              <div class="menu-desc">版本信息、联系方式</div>
+            </div>
+            <span class="menu-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 退出登录 -->
+      <button class="logout-btn" id="logoutBtn">退出登录</button>
+    </main>
+  </div>
+
+  <script>
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      loadUserProfile();
+      loadFavorites();
+      bindEvents();
+    });
+
+    // 加载用户信息
+    async function loadUserProfile() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (user.nickname) {
+        document.getElementById('userName').textContent = user.nickname;
+        document.getElementById('userAvatar').textContent = user.nickname.charAt(0);
+      }
+
+      try {
+        const response = await fetch(`/api/users/profile?user_id=${user.id || 1}`);
+        const data = await response.json();
+
+        if (data.code === 200) {
+          const profile = data.data;
+          document.getElementById('userName').textContent = profile.nickname || '美食探索者';
+          document.getElementById('userAvatar').textContent = (profile.nickname || '👤').charAt(0);
+          document.getElementById('favoritesCount').textContent = profile.favorite_count || 0;
+          document.getElementById('reviewsCount').textContent = profile.review_count || 0;
+          document.getElementById('pointsCount').textContent = profile.points || 0;
+        }
+      } catch (error) {
+        console.error('加载用户信息失败:', error);
+        // 使用本地数据
+        document.getElementById('userName').textContent = user.nickname || '美食探索者';
+        document.getElementById('favoritesCount').textContent = '3';
+        document.getElementById('reviewsCount').textContent = '5';
+        document.getElementById('pointsCount').textContent = '128';
+      }
+    }
+
+    // 加载收藏
+    async function loadFavorites() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      try {
+        const response = await fetch(`/api/users/favorites?user_id=${user.id || 1}`);
+        const data = await response.json();
+
+        if (data.code === 200 && data.data.length > 0) {
+          renderFavorites(data.data);
+        } else {
+          // 使用模拟数据
+          renderFavorites([
+            { target_id: 6, merchant_name: '老成都火锅', review_avg_score: 4.8, price_per_person: 68 },
+            { target_id: 17, merchant_name: '喜茶', review_avg_score: 4.6, price_per_person: 28 },
+            { target_id: 11, merchant_name: '老北京炸酱面馆', review_avg_score: 4.6, price_per_person: 35 }
+          ]);
+        }
+      } catch (error) {
+        console.error('加载收藏失败:', error);
+        renderFavorites([
+          { target_id: 6, merchant_name: '老成都火锅', review_avg_score: 4.8, price_per_person: 68 },
+          { target_id: 17, merchant_name: '喜茶', review_avg_score: 4.6, price_per_person: 28 }
+        ]);
+      }
+    }
+
+    // 渲染收藏
+    function renderFavorites(favorites) {
+      const container = document.getElementById('favoritesGrid');
+      
+      if (favorites.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🍽️</div>
+            <div class="empty-text">暂无收藏商家</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = favorites.map(f => `
+        <div class="favorite-card" onclick="goToMerchant(${f.target_id})">
+          <div class="favorite-image">🍽️</div>
+          <div class="favorite-info">
+            <div class="favorite-name">${f.merchant_name}</div>
+            <div class="favorite-meta">
+              ★ ${f.review_avg_score} · ¥${f.price_per_person}/人
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 绑定事件
+    function bindEvents() {
+      // 退出登录
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        if (confirm('确定要退出登录吗？')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('guestMode');
+          window.location.href = '/';
+        }
+      });
+
+      // 编辑资料
+      document.getElementById('editBtn').addEventListener('click', () => {
+        alert('编辑资料功能开发中...');
+      });
+    }
+
+    // 跳转函数
+    function goHome() {
+      window.location.href = '/home';
+    }
+
+    function goToMerchant(id) {
+      window.location.href = `/merchant/${id}`;
+    }
+
+    function goToHistory() {
+      alert('浏览历史功能开发中...');
+    }
+
+    function goToReviews() {
+      alert('我的评价功能开发中...');
+    }
+  </script>
+</body>
+</html>

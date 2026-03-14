@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, initial-scale=1.0">
+  <title>搜索 - 大学城美食地图</title>
+  <link rel="stylesheet" href="/styles/common.css">
+  <style>
+    .search-page {
+      min-height: 100vh;
+      background: var(--bg-canvas);
+    }
+
+    /* 顶部搜索栏 */
+    .search-header {
+      position: sticky;
+      top: 0;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-4) var(--space-6);
+      z-index: 100;
+    }
+
+    .search-bar-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+    }
+
+    .back-btn:hover {
+      background: var(--bg-canvas);
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 var(--space-4) 0 44px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      font-size: 15px;
+      background: var(--bg-canvas);
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-500);
+      background: var(--bg-primary);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: var(--space-4);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: var(--text-tertiary);
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: var(--space-3);
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text-tertiary);
+      display: none;
+    }
+
+    .clear-btn.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-btn {
+      padding: 0 var(--space-4);
+      height: 44px;
+      background: var(--primary-500);
+      color: white;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .search-btn:hover {
+      background: var(--primary-600);
+    }
+
+    /* 主内容 */
+    .search-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-6);
+    }
+
+    /* 搜索历史和热门 */
+    .search-section {
+      margin-bottom: var(--space-6);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .section-action {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+    }
+
+    .section-action:hover {
+      color: var(--primary-500);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+
+    .tag-item {
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg-primary);
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border);
+    }
+
+    .tag-item:hover {
+      background: var(--primary-50);
+      border-color: var(--primary-200);
+      color: var(--primary-700);
+    }
+
+    /* 搜索结果 */
+    .search-results {
+      display: none;
+    }
+
+    .search-results.show {
+      display: block;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .results-count {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .results-filter {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .filter-option {
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .filter-option:hover,
+    .filter-option.active {
+      color: var(--primary-500);
+      background: var(--primary-50);
+    }
+
+    /* 商家列表 */
+    .merchant-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .merchant-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .merchant-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .merchant-image {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      flex-shrink: 0;
+    }
+
+    .merchant-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .merchant-header-info {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .merchant-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .merchant-status {
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .merchant-status.idle { background: var(--status-idle); }
+    .merchant-status.busy { background: var(--status-busy); }
+    .merchant-status.full { background: var(--status-full); }
+    .merchant-status.queue { background: var(--status-queue); }
+
+    .merchant-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-2);
+    }
+
+    .merchant-score {
+      color: var(--warning);
+      font-weight: 600;
+    }
+
+    .merchant-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .merchant-tag {
+      padding: var(--space-1) var(--space-2);
+      background: var(--bg-canvas);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+
+    .merchant-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--space-2);
+    }
+
+    .merchant-location {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    .merchant-queue {
+      font-size: 13px;
+      color: var(--status-full);
+      font-weight: 500;
+    }
+
+    /* 空状态 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16);
+      color: var(--text-tertiary);
+    }
+
+    .empty-icon {
+      font-size: 80px;
+      margin-bottom: var(--space-4);
+      opacity: 0.5;
+    }
+
+    .empty-text {
+      font-size: 15px;
+    }
+
+    /* 分类快捷入口 */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4);
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-card);
+    }
+
+    .category-item:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .category-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .category-name {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="search-page">
+    <!-- 顶部搜索栏 -->
+    <header class="search-header">
+      <div class="search-bar-container">
+        <button class="back-btn" onclick="history.back()">←</button>
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="searchInput" placeholder="搜索商家、菜品、地点..." autocomplete="off">
+          <button class="clear-btn" id="clearBtn">✕</button>
+        </div>
+        <button class="search-btn" id="searchBtn">搜索</button>
+      </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="search-content">
+      <!-- 默认内容 -->
+      <div id="defaultContent">
+        <!-- 分类快捷入口 -->
+        <div class="category-grid">
+          <div class="category-item" data-keyword="快餐">
+            <div class="category-icon">🍔</div>
+            <span class="category-name">快餐</span>
+          </div>
+          <div class="category-item" data-keyword="火锅">
+            <div class="category-icon">🍲</div>
+            <span class="category-name">火锅</span>
+          </div>
+          <div class="category-item" data-keyword="奶茶">
+            <div class="category-icon">🧋</div>
+            <span class="category-name">奶茶</span>
+          </div>
+          <div class="category-item" data-keyword="咖啡">
+            <div class="category-icon">☕</div>
+            <span class="category-name">咖啡</span>
+          </div>
+          <div class="category-item" data-keyword="烧烤">
+            <div class="category-icon">🍢</div>
+            <span class="category-name">烧烤</span>
+          </div>
+          <div class="category-item" data-keyword="面馆">
+            <div class="category-icon">🍜</div>
+            <span class="category-name">面馆</span>
+          </div>
+        </div>
+
+        <!-- 搜索历史 -->
+        <div class="search-section">
+          <div class="section-header">
+            <span class="section-title">🔍 搜索历史</span>
+            <span class="section-action" id="clearHistory">清空</span>
+          </div>
+          <div class="tag-list" id="historyList">
+            <span class="tag-item">麦当劳</span>
+            <span class="tag-item">火锅</span>
+            <span class="tag-item">星巴克</span>
+          </div>
+        </div>
+
+        <!-- 热门搜索 -->
+        <div class="search-section">
+          <div class="section-header">
+            <span class="section-title">🔥 热门搜索</span>
+          </div>
+          <div class="tag-list">
+            <span class="tag-item">老成都火锅</span>
+            <span class="tag-item">喜茶</span>
+            <span class="tag-item">炸酱面</span>
+            <span class="tag-item">东北菜</span>
+            <span class="tag-item">瑞幸咖啡</span>
+            <span class="tag-item">烤串</span>
+            <span class="tag-item">重庆小面</span>
+            <span class="tag-item">粤菜皇</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 搜索结果 -->
+      <div class="search-results" id="searchResults">
+        <div class="results-header">
+          <span class="results-count">找到 <strong id="resultsCount">0</strong> 家商家</span>
+          <div class="results-filter">
+            <span class="filter-option active">综合</span>
+            <span class="filter-option">销量</span>
+            <span class="filter-option">评分</span>
+            <span class="filter-option">距离</span>
+          </div>
+        </div>
+        <div class="merchant-list" id="merchantList">
+          <!-- 动态生成 -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 状态映射
+    const statusMap = {
+      0: { text: '未知', class: 'closed' },
+      1: { text: '空闲', class: 'idle' },
+      2: { text: '忙碌', class: 'busy' },
+      3: { text: '满客', class: 'full' },
+      4: { text: '排队', class: 'queue' },
+      5: { text: '休息', class: 'closed' }
+    };
+
+    // 获取商家emoji
+    function getMerchantEmoji(name) {
+      const map = {
+        '麦当劳': '🍔', '肯德基': '🍗', '吉野家': '🍱',
+        '火锅': '🍲', '星巴克': '☕', '喜茶': '🧋',
+        '炸酱': '🍝', '东北': '🥟', '拉面': '🍜',
+        '烤串': '🍢', '包子': '🥟', '煎饼': '🌯'
+      };
+      for (const [key, emoji] of Object.entries(map)) {
+        if (name.includes(key)) return emoji;
+      }
+      return '🍽️';
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      bindEvents();
+      loadSearchHistory();
+    });
+
+    // 绑定事件
+    function bindEvents() {
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearBtn');
+      const searchBtn = document.getElementById('searchBtn');
+
+      // 输入事件
+      searchInput.addEventListener('input', () => {
+        clearBtn.classList.toggle('show', searchInput.value.length > 0);
+      });
+
+      // 清空按钮
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.classList.remove('show');
+        showDefaultContent();
+        searchInput.focus();
+      });
+
+      // 搜索按钮
+      searchBtn.addEventListener('click', () => {
+        const keyword = searchInput.value.trim();
+        if (keyword) {
+          performSearch(keyword);
+          saveSearchHistory(keyword);
+        }
+      });
+
+      // 回车搜索
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const keyword = searchInput.value.trim();
+          if (keyword) {
+            performSearch(keyword);
+            saveSearchHistory(keyword);
+          }
+        }
+      });
+
+      // 分类快捷入口
+      document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const keyword = item.dataset.keyword;
+          searchInput.value = keyword;
+          clearBtn.classList.add('show');
+          performSearch(keyword);
+        });
+      });
+
+      // 热门搜索和历史
+      document.querySelectorAll('.tag-item').forEach(tag => {
+        tag.addEventListener('click', () => {
+          const keyword = tag.textContent;
+          searchInput.value = keyword;
+          clearBtn.classList.add('show');
+          performSearch(keyword);
+        });
+      });
+
+      // 清空历史
+      document.getElementById('clearHistory').addEventListener('click', () => {
+        localStorage.removeItem('searchHistory');
+        document.getElementById('historyList').innerHTML = '';
+      });
+
+      // 筛选选项
+      document.querySelectorAll('.filter-option').forEach(option => {
+        option.addEventListener('click', () => {
+          document.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+          option.classList.add('active');
+        });
+      });
+    }
+
+    // 显示默认内容
+    function showDefaultContent() {
+      document.getElementById('defaultContent').style.display = 'block';
+      document.getElementById('searchResults').classList.remove('show');
+    }
+
+    // 执行搜索
+    async function performSearch(keyword) {
+      document.getElementById('defaultContent').style.display = 'none';
+      document.getElementById('searchResults').classList.add('show');
+      document.getElementById('merchantList').innerHTML = '<div class="loading">搜索中...</div>';
+
+      try {
+        const response = await fetch(`/api/merchants/search/all?keyword=${encodeURIComponent(keyword)}`);
+        const data = await response.json();
+
+        if (data.code === 200) {
+          renderResults(data.data);
+        } else {
+          renderResults([]);
+        }
+      } catch (error) {
+        console.error('搜索失败:', error);
+        // 使用模拟数据
+        const mockResults = [
+          { id: 1, name: '麦当劳·清华东门店', short_name: '麦当劳', business_type: 1, review_avg_score: 4.5, price_per_person: 35, realtime_status: 1, queue_count: 0, address: '五道口购物中心1层', scene_tags: ['课间快吃'], cuisine_types: ['快餐'] },
+          { id: 6, name: '老成都火锅·五道口店', short_name: '老成都火锅', business_type: 1, review_avg_score: 4.8, price_per_person: 68, realtime_status: 4, queue_count: 12, address: '五道口购物中心3层', scene_tags: ['宿舍聚餐'], cuisine_types: ['火锅'] },
+          { id: 15, name: '星巴克·清华科技园店', short_name: '星巴克', business_type: 2, review_avg_score: 4.7, price_per_person: 38, realtime_status: 2, queue_count: 7, address: '清华科技园A座', scene_tags: ['约会'], cuisine_types: ['咖啡'] }
+        ].filter(m => m.name.includes(keyword) || m.cuisine_types.some(t => t.includes(keyword)));
+        
+        renderResults(mockResults);
+      }
+    }
+
+    // 渲染搜索结果
+    function renderResults(merchants) {
+      document.getElementById('resultsCount').textContent = merchants.length;
+      const container = document.getElementById('merchantList');
+
+      if (merchants.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-text">没有找到相关商家</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = merchants.map(m => {
+        const status = statusMap[m.realtime_status] || statusMap[0];
+        return `
+          <div class="merchant-item" onclick="goToMerchant(${m.id})">
+            <div class="merchant-image">${getMerchantEmoji(m.name)}</div>
+            <div class="merchant-info">
+              <div>
+                <div class="merchant-header-info">
+                  <h3 class="merchant-title">${m.name}</h3>
+                  <span class="merchant-status ${status.class}">${status.text}</span>
+                </div>
+                <div class="merchant-meta">
+                  <span class="merchant-score">★ ${m.review_avg_score}</span>
+                  <span>${m.cuisine_types?.[0] || '美食'}</span>
+                  <span>¥${m.price_per_person}/人</span>
+                </div>
+                <div class="merchant-tags">
+                  ${(m.scene_tags || []).slice(0, 3).map(t => `<span class="merchant-tag">${t}</span>`).join('')}
+                </div>
+              </div>
+              <div class="merchant-footer">
+                <span class="merchant-location">📍 ${m.address || '学院路附近'}</span>
+                ${m.queue_count > 0 ? `<span class="merchant-queue">🔥 ${m.queue_count}人排队</span>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 跳转到商家详情
+    function goToMerchant(id) {
+      window.location.href = `/merchant/${id}`;
+    }
+
+    // 加载搜索历史
+    function loadSearchHistory() {
+      const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+      const container = document.getElementById('historyList');
+      
+      if (history.length === 0) {
+        container.innerHTML = '<span style="color: var(--text-tertiary); font-size: 13px;">暂无搜索历史</span>';
+        return;
+      }
+
+      container.innerHTML = history.map(h => `<span class="tag-item">${h}</span>`).join('');
+      
+      // 重新绑定事件
+      container.querySelectorAll('.tag-item').forEach(tag => {
+        tag.addEventListener('click', () => {
+          document.getElementById('searchInput').value = tag.textContent;
+          document.getElementById('clearBtn').classList.add('show');
+          performSearch(tag.textContent);
+        });
+      });
+    }
+
+    // 保存搜索历史
+    function saveSearchHistory(keyword) {
+      let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+      history = history.filter(h => h !== keyword);
+      history.unshift(keyword);
+      history = history.slice(0, 10);
+      localStorage.setItem('searchHistory', JSON.stringify(history));
+      loadSearchHistory();
+    }
+  </script>
+</body>
+</html>
