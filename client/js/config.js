@@ -5,8 +5,8 @@ window.apiUrl = function(path) {
   return (window.API_BASE_URL || '') + path;
 };
 
-// 静态部署时（如 GitHub Pages）设为 'pages/'，同源 Express 时留空
-// CI 部署时会注入，使 /home 变为 pages/home.html
+// 静态部署时（如 GitHub Pages）设为绝对路径如 '/Campus-Food-Seeker/pages/'，同源 Express 时留空
+// 必须用绝对路径，否则在 .../pages/login.html 下会解析成 .../pages/pages/home.html
 window.APP_BASE_PATH = window.APP_BASE_PATH || '';
 window.toPage = function(path) {
   var m = path.match(/^\/merchant\/(\d+)$/);

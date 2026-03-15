@@ -26,19 +26,21 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      # 注入可配置的后端 base URL 与静态路径（GitHub Pages 使用 pages/）
+      # 注入可配置的后端 base URL 与静态路径（使用绝对路径避免 pages/pages 重复）
       # 在仓库 Settings -> Secrets and variables -> Actions 中配置 BACKEND_BASE_URL
       - name: Inject config for GitHub Pages
         run: |
           BACKEND="${BACKEND_BASE_URL:-}"
-          # 转义为 JS 字符串（去掉末尾斜杠）
           BACKEND="${BACKEND%/}"
-          cat > client/js/config.js << 'CONFIG_EOF'
-          window.API_BASE_URL = '__BACKEND_BASE_URL__';
+          # 使用绝对路径 /RepoName/pages/，避免相对路径在 .../pages/login.html 下解析成 .../pages/pages/...
+          REPO_NAME="${{ github.event.repository.name }}"
+          APP_BASE="/${REPO_NAME}/pages/"
+          cat > client/js/config.js << CONFIG_EOF
+          window.API_BASE_URL = '${BACKEND}';
           window.apiUrl = function(path) {
             return (window.API_BASE_URL || '') + path;
           };
-          window.APP_BASE_PATH = 'pages/';
+          window.APP_BASE_PATH = '${APP_BASE}';
           window.toPage = function(path) {
             var m = path.match(/^\/merchant\/(\d+)$/);
             if (m) return window.APP_BASE_PATH ? window.APP_BASE_PATH + 'merchant-detail.html?id=' + m[1] : path;
@@ -49,7 +51,6 @@ jobs:
             return path === '/' || !path ? '/' : '/' + path.replace(/^\//, '');
           };
           CONFIG_EOF
-          sed -i "s|__BACKEND_BASE_URL__|$BACKEND|g" client/js/config.js
         env:
           # 在仓库 Settings -> Variables 中添加 BACKEND_BASE_URL，或在此改为 secrets.BACKEND_BASE_URL
           BACKEND_BASE_URL: ${{ vars.BACKEND_BASE_URL }}
