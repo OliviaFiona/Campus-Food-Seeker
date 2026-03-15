@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1280, initial-scale=1.0">
   <title>商家工作台 - 大学城美食地图</title>
-  <link rel="stylesheet" href="/styles/common.css">
+  <link rel="stylesheet" href="../styles/common.css">
+  <script src="../js/config.js"></script>
   <style>
     .dashboard-page {
       display: flex;
@@ -187,6 +188,12 @@
 
     .icon-btn:hover {
       background: var(--bg-canvas);
+    }
+
+    .icon-btn .nav-icon-img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
     }
 
     /* 内容区域 */
@@ -563,7 +570,7 @@
       <header class="top-bar">
         <h1 class="page-title" id="pageTitle">数据概览</h1>
         <div class="top-actions">
-          <button class="icon-btn" title="通知">🔔</button>
+          <button class="icon-btn" title="通知"><img src="../assets/images/message-icon.png" alt="通知" class="nav-icon-img"></button>
           <button class="icon-btn" title="设置">⚙️</button>
           <button class="icon-btn" title="退出" onclick="logout()">🚪</button>
         </div>
@@ -797,7 +804,7 @@
       try {
         // 这里应该根据商家用户ID获取其管理的商家
         // 简化处理，使用第一个商家
-        const response = await fetch('/api/merchants/nearby?lat=39.992&lng=116.337&distance=5000');
+        const response = await fetch(window.apiUrl('/api/merchants/nearby?lat=39.992&lng=116.337&distance=5000'));
         const data = await response.json();
 
         if (data.code === 200 && data.data.length > 0) {
@@ -891,7 +898,7 @@
       const waitTime = parseInt(document.getElementById('waitTime').value) || 0;
 
       try {
-        const response = await fetch(`/api/merchants/${currentMerchantId}/status`, {
+        const response = await fetch(window.apiUrl(`/api/merchants/${currentMerchantId}/status`), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -918,7 +925,7 @@
 
     // 返回首页
     function goToHome() {
-      window.location.href = '/home';
+      window.location.href = window.toPage('/home');
     }
 
     // 退出登录
@@ -926,7 +933,7 @@
       if (confirm('确定要退出登录吗？')) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/';
+        window.location.href = window.toPage('/');
       }
     }
   </script>

@@ -1,0 +1,64 @@
+# 将前端部署到 GitHub Pages，后端 API 地址可配置
+name: Deploy frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: pages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      # 注入可配置的后端 base URL 与静态路径（GitHub Pages 使用 pages/）
+      # 在仓库 Settings -> Secrets and variables -> Actions 中配置 BACKEND_BASE_URL
+      - name: Inject config for GitHub Pages
+        run: |
+          BACKEND="${BACKEND_BASE_URL:-}"
+          # 转义为 JS 字符串（去掉末尾斜杠）
+          BACKEND="${BACKEND%/}"
+          cat > client/js/config.js << 'CONFIG_EOF'
+          window.API_BASE_URL = '__BACKEND_BASE_URL__';
+          window.apiUrl = function(path) {
+            return (window.API_BASE_URL || '') + path;
+          };
+          window.APP_BASE_PATH = 'pages/';
+          window.toPage = function(path) {
+            var m = path.match(/^\/merchant\/(\d+)$/);
+            if (m) return window.APP_BASE_PATH ? window.APP_BASE_PATH + 'merchant-detail.html?id=' + m[1] : path;
+            var p = path.replace(/^\//, '') || 'login';
+            if (p === 'login') p = 'login.html';
+            else if (p.indexOf('.html') === -1) p = p + '.html';
+            if (window.APP_BASE_PATH) return window.APP_BASE_PATH + p;
+            return path === '/' || !path ? '/' : '/' + path.replace(/^\//, '');
+          };
+          CONFIG_EOF
+          sed -i "s|__BACKEND_BASE_URL__|$BACKEND|g" client/js/config.js
+        env:
+          # 在仓库 Settings -> Variables 中添加 BACKEND_BASE_URL，或在此改为 secrets.BACKEND_BASE_URL
+          BACKEND_BASE_URL: ${{ vars.BACKEND_BASE_URL }}
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: client
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

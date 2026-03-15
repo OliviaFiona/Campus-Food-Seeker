@@ -69,6 +69,53 @@ router.get('/nearby', async (req, res) => {
   }
 });
 
+// 获取筛选选项（价格、距离、类型，基于数据库）
+router.get('/filter-options', async (req, res) => {
+  try {
+    const priceRows = await query(`
+      SELECT MIN(price_per_person) as min_price, MAX(price_per_person) as max_price
+      FROM merchants WHERE status = 1 AND price_per_person > 0
+    `);
+    const priceBounds = (priceRows && priceRows[0]) ? priceRows[0] : { min_price: 0, max_price: 100 };
+    const minP = Number(priceBounds?.min_price) || 0;
+    const maxP = Math.max(Number(priceBounds?.max_price) || 100, 60);
+    const priceRanges = [
+      { label: '不限', price_min: null, price_max: null },
+      { label: '20元以下', price_min: null, price_max: 20 },
+      { label: '20-40元', price_min: 20, price_max: 40 },
+      { label: '40-60元', price_min: 40, price_max: 60 },
+      { label: '60-100元', price_min: 60, price_max: 100 },
+      { label: `${maxP}元以上`, price_min: maxP, price_max: null }
+    ];
+
+    const types = await query(`
+      SELECT DISTINCT business_type FROM merchants WHERE status = 1 ORDER BY business_type
+    `);
+    const typeLabels = { 1: '餐饮', 2: '饮品', 3: '甜品', 4: '小吃', 5: '其他' };
+    const typeOptions = [
+      { value: '', label: '不限' },
+      ...(types || []).map(t => ({ value: String(t.business_type), label: typeLabels[t.business_type] || '其他' }))
+    ];
+
+    const distanceOptions = [
+      { value: '', label: '不限' },
+      { value: 500, label: '500m内' },
+      { value: 1000, label: '1km内' },
+      { value: 2000, label: '2km内' },
+      { value: 3000, label: '3km内' },
+      { value: 5000, label: '5km内' }
+    ];
+
+    res.json({
+      code: 200,
+      data: { priceRanges, typeOptions, distanceOptions }
+    });
+  } catch (error) {
+    console.error('获取筛选选项错误:', error);
+    res.status(500).json({ code: 500, message: '服务器错误' });
+  }
+});
+
 // 获取商家详情
 router.get('/:id', async (req, res) => {
   try {

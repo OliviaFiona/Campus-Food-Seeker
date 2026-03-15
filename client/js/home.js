@@ -7,14 +7,51 @@ let map = null;
 let markers = [];
 let currentMerchant = null;
 let merchantsData = [];
+// 筛选选项（来自后端，空时用默认值保证弹窗有内容）
+const defaultFilterOptions = {
+  priceRanges: [
+    { label: '不限', price_min: null, price_max: null },
+    { label: '20元以下', price_min: null, price_max: 20 },
+    { label: '20-40元', price_min: 20, price_max: 40 },
+    { label: '40-60元', price_min: 40, price_max: 60 },
+    { label: '60元以上', price_min: 60, price_max: null }
+  ],
+  typeOptions: [
+    { value: '', label: '不限' },
+    { value: '1', label: '餐饮' },
+    { value: '2', label: '饮品' },
+    { value: '3', label: '甜品' },
+    { value: '4', label: '小吃' },
+    { value: '5', label: '其他' }
+  ],
+  distanceOptions: [
+    { value: '', label: '不限' },
+    { value: 500, label: '500m内' },
+    { value: 1000, label: '1km内' },
+    { value: 2000, label: '2km内' },
+    { value: 3000, label: '3km内' },
+    { value: 5000, label: '5km内' }
+  ],
+  sortOptions: [
+    { value: '', label: '智能排序' },
+    { value: 'distance', label: '距离优先' },
+    { value: 'rating', label: '评分优先' },
+    { value: 'sales', label: '销量优先' },
+    { value: 'price_asc', label: '价格从低到高' },
+    { value: 'price_desc', label: '价格从高到低' }
+  ]
+};
+let filterOptions = { ...defaultFilterOptions, priceRanges: [], typeOptions: [], distanceOptions: [], sortOptions: defaultFilterOptions.sortOptions };
+// 当前筛选条件
+let filterState = { price_min: null, price_max: null, distance: null, type: null, sortBy: '' };
 
-// 状态映射
+// 状态映射 Neo-Brutalism: 荧光绿/黄/灰/粉
 const statusMap = {
   0: { text: '未知', class: 'closed', color: '#9CA3AF' },
-  1: { text: '空闲', class: 'idle', color: '#22C55E' },
-  2: { text: '忙碌', class: 'busy', color: '#F59E0B' },
-  3: { text: '满客', class: 'full', color: '#EF4444' },
-  4: { text: '排队中', class: 'queue', color: '#8B5CF6' },
+  1: { text: '空闲', class: 'idle', color: '#00E55C' },
+  2: { text: '忙碌', class: 'busy', color: '#FFE600' },
+  3: { text: '满客', class: 'full', color: '#9CA3AF' },
+  4: { text: '排队中', class: 'queue', color: '#FF0066' },
   5: { text: '休息中', class: 'closed', color: '#9CA3AF' }
 };
 
@@ -64,11 +101,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 初始化地图
   initMap();
   
+  // 加载筛选选项（价格、距离、类型二级子标签）
+  await loadFilterOptions();
+  renderFilterDropdowns();
+  
   // 加载商家数据
   await loadMerchants();
   
   // 绑定事件
   bindEvents();
+  bindFilterEvents();
   
   // 隐藏加载
   document.getElementById('loadingOverlay').style.display = 'none';
@@ -132,23 +174,162 @@ function initMap() {
   });
 }
 
-// 加载商家数据
+// 加载商家数据（支持价格、距离、类型筛选）
 async function loadMerchants() {
   try {
-    const response = await fetch('/api/merchants/nearby?lat=39.992&lng=116.337&distance=5000');
+    const params = new URLSearchParams({ lat: 39.992, lng: 116.337 });
+    if (filterState.distance) params.set('distance', filterState.distance);
+    if (filterState.type) params.set('type', filterState.type);
+    if (filterState.price_min != null && filterState.price_min !== '') params.set('price_min', filterState.price_min);
+    if (filterState.price_max != null && filterState.price_max !== '') params.set('price_max', filterState.price_max);
+    const response = await fetch(window.apiUrl(`/api/merchants/nearby?${params.toString()}`));
     const data = await response.json();
     
     if (data.code === 200) {
       merchantsData = data.data;
       renderMarkers();
-      renderMerchantCarousel(merchantsData);
+      applySortAndRender();
     }
   } catch (error) {
     console.error('加载商家失败:', error);
-    // 使用模拟数据
     merchantsData = getMockMerchants();
-    renderMerchantCarousel(merchantsData);
+    applySortAndRender();
   }
+}
+
+// 加载筛选选项（从后端获取价格、距离、类型，空则用默认保证弹窗有内容）
+async function loadFilterOptions() {
+  try {
+    const response = await fetch(window.apiUrl('/api/merchants/filter-options'));
+    const data = await response.json();
+    if (data.code === 200 && data.data) {
+      const d = data.data;
+      filterOptions = {
+        priceRanges: (d.priceRanges && d.priceRanges.length) ? d.priceRanges : defaultFilterOptions.priceRanges,
+        typeOptions: (d.typeOptions && d.typeOptions.length) ? d.typeOptions : defaultFilterOptions.typeOptions,
+        distanceOptions: (d.distanceOptions && d.distanceOptions.length) ? d.distanceOptions : defaultFilterOptions.distanceOptions,
+        sortOptions: defaultFilterOptions.sortOptions
+      };
+    } else {
+      filterOptions = { ...defaultFilterOptions };
+    }
+  } catch (error) {
+    console.error('加载筛选选项失败:', error);
+    filterOptions = { ...defaultFilterOptions };
+  }
+}
+
+// 渲染筛选下拉（价格、距离、类型、排序）
+function renderFilterDropdowns() {
+  const priceEl = document.getElementById('filterDropdownPrice');
+  const distanceEl = document.getElementById('filterDropdownDistance');
+  const typeEl = document.getElementById('filterDropdownType');
+  const sortEl = document.getElementById('filterDropdownSort');
+  const priceOpts = (filterOptions.priceRanges && filterOptions.priceRanges.length) ? filterOptions.priceRanges : defaultFilterOptions.priceRanges;
+  const distanceOpts = (filterOptions.distanceOptions && filterOptions.distanceOptions.length) ? filterOptions.distanceOptions : defaultFilterOptions.distanceOptions;
+  const typeOpts = (filterOptions.typeOptions && filterOptions.typeOptions.length) ? filterOptions.typeOptions : defaultFilterOptions.typeOptions;
+  const sortOpts = (filterOptions.sortOptions && filterOptions.sortOptions.length) ? filterOptions.sortOptions : defaultFilterOptions.sortOptions;
+
+  if (priceEl) {
+    priceEl.innerHTML = priceOpts.map((opt, i) =>
+      `<div class="sheet-filter-option" data-filter="price" data-price-min="${opt.price_min ?? ''}" data-price-max="${opt.price_max ?? ''}" ${i === 0 ? 'data-default="1"' : ''}>${opt.label}</div>`
+    ).join('');
+  }
+  if (distanceEl) {
+    distanceEl.innerHTML = distanceOpts.map((opt) =>
+      `<div class="sheet-filter-option" data-filter="distance" data-value="${opt.value}">${opt.label}</div>`
+    ).join('');
+  }
+  if (typeEl) {
+    typeEl.innerHTML = typeOpts.map((opt) =>
+      `<div class="sheet-filter-option" data-filter="type" data-value="${opt.value}">${opt.label}</div>`
+    ).join('');
+  }
+  if (sortEl) {
+    sortEl.innerHTML = sortOpts.map((opt) =>
+      `<div class="sheet-filter-option" data-filter="sort" data-value="${opt.value}">${opt.label}</div>`
+    ).join('');
+  }
+}
+
+// 绑定筛选器事件（点击主按钮展开/收起，点击子标签应用筛选）
+function bindFilterEvents() {
+  document.querySelectorAll('.sheet-filter-wrap').forEach(wrap => {
+    const btn = wrap.querySelector('.sheet-filter');
+    const dropdown = wrap.querySelector('.sheet-filter-dropdown');
+    if (!btn || !dropdown) return;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      wrap.classList.toggle('open');
+      document.querySelectorAll('.sheet-filter-wrap').forEach(w => {
+        if (w !== wrap) w.classList.remove('open');
+      });
+      const bottomSheet = document.getElementById('bottomSheet');
+      const anyOpen = document.querySelector('.sheet-filter-wrap.open');
+      if (bottomSheet) bottomSheet.classList.toggle('filter-dropdown-open', !!anyOpen);
+    });
+    dropdown.querySelectorAll('.sheet-filter-option').forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const filter = opt.dataset.filter;
+        wrap.classList.remove('open');
+        const bottomSheet = document.getElementById('bottomSheet');
+        if (bottomSheet) bottomSheet.classList.remove('filter-dropdown-open');
+        const label = opt.textContent.trim();
+        const defaultLabels = { price: '价格', distance: '距离', type: '类型', sort: '排序' };
+        wrap.querySelector('.sheet-filter-label').textContent = (label === '不限' || label === '智能排序') ? (defaultLabels[filter] || label) : label;
+        wrap.querySelector('.sheet-filter').classList.toggle('active', label !== '不限' && label !== '智能排序');
+        if (filter === 'price') {
+          filterState.price_min = (opt.dataset.priceMin !== undefined && opt.dataset.priceMin !== '') ? Number(opt.dataset.priceMin) : null;
+          filterState.price_max = (opt.dataset.priceMax !== undefined && opt.dataset.priceMax !== '') ? Number(opt.dataset.priceMax) : null;
+        } else if (filter === 'distance') {
+          filterState.distance = (opt.dataset.value !== undefined && opt.dataset.value !== '') ? Number(opt.dataset.value) : null;
+        } else if (filter === 'type') {
+          filterState.type = (opt.dataset.value !== undefined && opt.dataset.value !== '') ? opt.dataset.value : null;
+        } else if (filter === 'sort') {
+          filterState.sortBy = (opt.dataset.value !== undefined && opt.dataset.value !== '') ? opt.dataset.value : '';
+        }
+        dropdown.querySelectorAll('.sheet-filter-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        if (filter === 'sort') {
+          applySortAndRender();
+        } else {
+          loadMerchants();
+        }
+      });
+    });
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.sheet-filter-wrap').forEach(w => w.classList.remove('open'));
+    const bottomSheet = document.getElementById('bottomSheet');
+    if (bottomSheet) bottomSheet.classList.remove('filter-dropdown-open');
+  });
+  // 初始化选中：每个下拉的第一项为选中
+  document.querySelectorAll('.sheet-filter-wrap').forEach(wrap => {
+    const dropdown = wrap.querySelector('.sheet-filter-dropdown');
+    if (dropdown) {
+      const first = dropdown.querySelector('.sheet-filter-option');
+      if (first) first.classList.add('selected');
+    }
+  });
+}
+
+// 按当前排序条件排序并渲染商家列表
+function applySortAndRender() {
+  let list = [...merchantsData];
+  const sortBy = filterState.sortBy;
+  if (sortBy === 'distance') {
+    list.sort((a, b) => (a.distance ?? 999) - (b.distance ?? 999));
+  } else if (sortBy === 'rating') {
+    list.sort((a, b) => (b.review_avg_score ?? 0) - (a.review_avg_score ?? 0));
+  } else if (sortBy === 'sales') {
+    list.sort((a, b) => (b.order_count_total ?? b.favorite_count ?? 0) - (a.order_count_total ?? a.favorite_count ?? 0));
+  } else if (sortBy === 'price_asc') {
+    list.sort((a, b) => (a.price_per_person ?? 0) - (b.price_per_person ?? 0));
+  } else if (sortBy === 'price_desc') {
+    list.sort((a, b) => (b.price_per_person ?? 0) - (a.price_per_person ?? 0));
+  }
+  renderMerchantCarousel(list);
 }
 
 // 模拟商家数据（备用）
@@ -174,19 +355,20 @@ function renderMarkers() {
   merchantsData.forEach(merchant => {
     const status = statusMap[merchant.realtime_status] || statusMap[0];
     
-    // 创建自定义标记
+    // Neo-Brutalism: 黑色粗边框正方形，荧光色填充，硬阴影，尺寸放大20%
+    const size = 53;
     const markerContent = `
       <div style="
-        width: 44px;
-        height: 44px;
-        background: white;
-        border-radius: 50%;
+        width: ${size}px;
+        height: ${size}px;
+        background: ${status.color};
+        border: 2.5px solid #000000;
+        border-radius: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 22px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        border: 3px solid ${status.color};
+        font-size: 26px;
+        box-shadow: 4px 4px 0px #000000;
         cursor: pointer;
       ">${getMerchantEmoji(merchant.name)}</div>
     `;
@@ -194,7 +376,7 @@ function renderMarkers() {
     const marker = new AMap.Marker({
       position: [merchant.longitude, merchant.latitude],
       content: markerContent,
-      offset: new AMap.Pixel(-22, -22)
+      offset: new AMap.Pixel(-size / 2, -size / 2)
     });
     
     marker.on('click', () => openDetailPanel(merchant));
@@ -266,7 +448,7 @@ async function openDetailPanel(merchant) {
   // 尝试获取完整详情
   let detail = merchant;
   try {
-    const response = await fetch(`/api/merchants/${merchant.id}`);
+    const response = await fetch(window.apiUrl(`/api/merchants/${merchant.id}`));
     const data = await response.json();
     if (data.code === 200) {
       detail = data.data;
@@ -395,7 +577,7 @@ async function toggleFavorite() {
   const isFavorited = favIcon.textContent === '❤️';
   
   try {
-    const response = await fetch('/api/users/favorites', {
+    const response = await fetch(window.apiUrl('/api/users/favorites'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -427,6 +609,42 @@ function bindEvents() {
   // 收藏按钮
   document.getElementById('detailFavorite').addEventListener('click', toggleFavorite);
   
+  // ========== 底部 Sheet 展开/收起 ==========
+  const bottomSheet = document.getElementById('bottomSheet');
+  const sheetHandle = document.getElementById('sheetHandle');
+  
+  // 点击 handle 切换展开/收起
+  sheetHandle.addEventListener('click', () => {
+    bottomSheet.classList.toggle('expanded');
+  });
+  
+  // 点击外部收起 sheet
+  document.addEventListener('click', (e) => {
+    // 如果 sheet 是展开的，且点击的不是 sheet 内部
+    if (bottomSheet.classList.contains('expanded')) {
+      if (!bottomSheet.contains(e.target)) {
+        bottomSheet.classList.remove('expanded');
+      }
+    }
+  });
+  
+  // 点击modal外部关闭（右侧详情面板）
+  document.addEventListener('click', (e) => {
+    const panel = document.getElementById('detailPanel');
+    // 如果modal是打开的，且点击的不是modal内部，且点击的不是打开modal的卡片或标记
+    if (panel.classList.contains('open')) {
+      // 检查点击是否在modal内部
+      if (!panel.contains(e.target)) {
+        // 检查点击的不是商家卡片或地图标记（这些会触发打开modal）
+        const isMerchantCard = e.target.closest('.merchant-card');
+        const isMapMarker = e.target.closest('.amap-marker'); // 高德地图标记
+        if (!isMerchantCard && !isMapMarker) {
+          closeDetailPanel();
+        }
+      }
+    }
+  });
+  
   // 左侧导航
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -434,7 +652,7 @@ function bindEvents() {
       const page = item.dataset.page;
       
       if (page) {
-        window.location.href = `/${page}`;
+        window.location.href = window.toPage(`/${page}`);
         return;
       }
       
@@ -442,23 +660,10 @@ function bindEvents() {
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
       item.classList.add('active');
       
-      // 处理热门推荐的子菜单
-      if (filter === 'hot') {
-        const subItems = document.getElementById('hotSubItems');
-        subItems.style.display = subItems.style.display === 'none' ? 'block' : 'none';
-      }
-      
       // 应用筛选
       if (filter) {
         applyFilter(filter);
       }
-    });
-  });
-  
-  // 子菜单项
-  document.querySelectorAll('.nav-sub-item').forEach(item => {
-    item.addEventListener('click', () => {
-      applyFilter(item.dataset.filter);
     });
   });
   
@@ -494,12 +699,12 @@ function bindEvents() {
   
   // 搜索框
   document.getElementById('searchBox').addEventListener('click', () => {
-    window.location.href = '/search';
+    window.location.href = window.toPage('/search');
   });
   
   // 用户头像
   document.getElementById('userAvatar').addEventListener('click', () => {
-    window.location.href = '/profile';
+    window.location.href = window.toPage('/profile');
   });
 }
 
@@ -524,10 +729,6 @@ function applyFilter(filter) {
     case 'scene-night':
       filtered = filtered.filter(m => m.scene_tags?.includes('深夜食堂'));
       break;
-    case 'hot-today':
-    case 'hot-week':
-      loadHotMerchants();
-      return;
   }
   
   renderMerchantCarousel(filtered);
@@ -542,7 +743,7 @@ function filterByType(type) {
 // 加载热门商家
 async function loadHotMerchants() {
   try {
-    const response = await fetch('/api/merchants/ranking/hot?type=today');
+    const response = await fetch(window.apiUrl('/api/merchants/ranking/hot?type=today'));
     const data = await response.json();
     
     if (data.code === 200) {

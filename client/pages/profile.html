@@ -4,20 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1280, initial-scale=1.0">
   <title>个人中心 - 大学城美食地图</title>
-  <link rel="stylesheet" href="/styles/common.css">
+  <link rel="stylesheet" href="../styles/common.css">
+  <script src="../js/config.js"></script>
   <style>
+    /* Neo-Brutalism 2.0 - 个人中心 */
     .profile-page {
       min-height: 100vh;
-      background: var(--bg-canvas);
+      background: var(--bg-primary);
     }
 
-    /* 顶部导航 */
     .top-nav {
       position: sticky;
       top: 0;
       height: 64px;
       background: var(--bg-primary);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 3px solid var(--border-black);
       display: flex;
       align-items: center;
       padding: 0 var(--space-6);
@@ -28,278 +29,473 @@
     .back-btn {
       width: 40px;
       height: 40px;
-      border-radius: var(--radius-lg);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      background: var(--bg-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: transparent;
-      border: none;
       font-size: 20px;
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
     .back-btn:hover {
-      background: var(--bg-canvas);
+      box-shadow: none;
+      transform: translate(2px, 2px);
     }
 
     .nav-title {
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 900;
       flex: 1;
+      color: var(--text-primary);
     }
 
     .nav-action {
       font-size: 14px;
-      color: var(--text-secondary);
+      font-weight: 700;
+      color: var(--accent-blue);
       cursor: pointer;
       padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-md);
-      transition: all 0.2s ease;
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      background: var(--bg-secondary);
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
     .nav-action:hover {
-      background: var(--bg-canvas);
-      color: var(--primary-500);
+      box-shadow: none;
+      transform: translate(2px, 2px);
     }
 
-    /* 主内容 */
-    .main-content {
-      max-width: 800px;
+    .main-container {
+      max-width: 1400px;
       margin: 0 auto;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 35% 1fr;
+      gap: 0;
+      min-height: calc(100vh - 64px);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
       padding: var(--space-6);
     }
 
-    /* 用户信息卡片 */
     .user-card {
-      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-      border-radius: var(--radius-xl);
+      background: var(--accent-orange);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
       padding: var(--space-8);
-      color: white;
-      margin-bottom: var(--space-6);
-      box-shadow: var(--shadow-card);
-    }
-
-    .user-header {
-      display: flex;
-      align-items: center;
-      gap: var(--space-5);
-      margin-bottom: var(--space-6);
+      color: var(--text-inverted);
+      box-shadow: var(--shadow-hard);
+      text-align: center;
     }
 
     .user-avatar {
-      width: 80px;
-      height: 80px;
-      background: white;
-      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .user-info {
-      flex: 1;
+      font-size: 48px;
+      margin: 0 auto var(--space-5);
+      box-shadow: var(--shadow-hard);
     }
 
     .user-name {
-      font-size: 22px;
-      font-weight: 700;
+      font-size: 32px;
+      font-weight: 900;
       margin-bottom: var(--space-2);
+      letter-spacing: -0.02em;
+      color: var(--text-inverted);
     }
 
     .user-school {
       font-size: 14px;
-      opacity: 0.9;
-      display: flex;
+      font-weight: 700;
+      display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: var(--space-2);
+      margin-bottom: var(--space-5);
+      padding: var(--space-1) var(--space-3);
+      background: var(--accent-yellow);
+      color: var(--text-primary);
+      border: 2px solid var(--border-black);
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .user-stats {
       display: flex;
-      gap: var(--space-8);
+      justify-content: space-around;
       padding-top: var(--space-5);
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-top: 2.5px solid var(--border-black);
     }
 
     .stat-item {
       text-align: center;
+      padding: var(--space-2);
+      border: 2px solid var(--border-black);
+      min-width: 0;
     }
 
+    .user-stats .stat-item:nth-child(1) { background: var(--accent-green); }
+    .user-stats .stat-item:nth-child(2) { background: var(--accent-blue); }
+    .user-stats .stat-item:nth-child(3) { background: var(--accent-orange); }
+
     .stat-value {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 28px;
+      font-weight: 900;
       margin-bottom: var(--space-1);
+      color: var(--text-inverted);
     }
 
     .stat-label {
       font-size: 13px;
-      opacity: 0.8;
+      font-weight: 700;
+      color: var(--text-inverted);
+      opacity: 0.95;
     }
 
-    /* 功能菜单 */
-    .menu-section {
-      background: var(--bg-primary);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-card);
-      margin-bottom: var(--space-5);
-      overflow: hidden;
+    .quick-actions {
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      box-shadow: var(--shadow-hard);
+      padding: var(--space-5);
     }
 
-    .menu-header {
-      padding: var(--space-4) var(--space-6);
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .menu-title {
+    .quick-title {
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 900;
       color: var(--text-primary);
+      margin-bottom: var(--space-4);
     }
 
-    .menu-list {
-      padding: var(--space-2) 0;
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
     }
 
-    .menu-item {
+    .quick-item {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: var(--space-4);
-      padding: var(--space-4) var(--space-6);
+      gap: var(--space-2);
+      padding: var(--space-4);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
       cursor: pointer;
-      transition: all 0.2s ease;
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
-    .menu-item:hover {
-      background: var(--bg-canvas);
+    .quick-item:nth-child(1) { background: var(--accent-yellow); }
+    .quick-item:nth-child(2) { background: var(--accent-pink); color: var(--text-inverted); }
+    .quick-item:nth-child(3) { background: var(--accent-blue); color: var(--text-inverted); }
+    .quick-item:nth-child(4) { background: var(--accent-green); }
+
+    .quick-item:hover {
+      box-shadow: none;
+      transform: translate(2px, 2px);
     }
 
-    .menu-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--bg-canvas);
-      border-radius: var(--radius-lg);
+    .quick-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 24px;
     }
 
-    .menu-content {
+    .quick-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .quick-item:nth-child(2) .quick-label,
+    .quick-item:nth-child(3) .quick-label { color: var(--text-inverted); }
+
+    .logout-btn {
+      width: 100%;
+      height: 48px;
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .logout-btn:hover {
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      padding: var(--space-6);
+      border-left: 3px solid var(--border-black);
+    }
+
+    .content-section {
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      box-shadow: var(--shadow-hard);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 2.5px solid var(--border-black);
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--text-primary);
+    }
+
+    .section-action {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      cursor: pointer;
+    }
+
+    .section-action:hover {
+      text-decoration: underline;
+    }
+
+    .section-body {
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .favorites-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .favorite-card {
+      display: flex;
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .favorite-card:hover {
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+
+    .favorite-card {
+      border-left: 5px solid var(--accent-orange);
+    }
+
+    .favorite-image {
+      height: 80px;
+      width: 80px;
+      background: var(--accent-orange);
+      border-right: 2.5px solid var(--border-black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+
+    .favorite-info {
       flex: 1;
+      padding: var(--space-4);
+    }
+
+    .favorite-name {
+      font-size: 16px;
+      font-weight: 900;
+      margin-bottom: var(--space-2);
+      color: var(--text-primary);
+    }
+
+    .favorite-meta {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+    }
+
+    .menu-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-5);
+      background: var(--bg-primary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: var(--shadow-hard);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .menu-item:hover {
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+
+    .menu-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
     }
 
     .menu-label {
       font-size: 15px;
-      font-weight: 500;
+      font-weight: 900;
+      color: var(--text-primary);
+    }
+
+    .menu-desc {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .menu-badge {
+      position: absolute;
+      top: var(--space-2);
+      right: var(--space-2);
+      padding: var(--space-1) var(--space-2);
+      background: var(--accent-pink);
+      color: var(--text-primary);
+      border: 2px solid var(--border-black);
+      border-radius: 0;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .settings-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-black);
+      border-radius: 0;
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-item:hover {
+      background: var(--accent-yellow);
+    }
+
+    .setting-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .setting-content {
+      flex: 1;
+    }
+
+    .setting-label {
+      font-size: 15px;
+      font-weight: 700;
       color: var(--text-primary);
       margin-bottom: var(--space-1);
     }
 
-    .menu-desc {
-      font-size: 12px;
-      color: var(--text-tertiary);
+    .setting-desc {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
     }
 
-    .menu-arrow {
+    .setting-arrow {
       font-size: 18px;
-      color: var(--text-tertiary);
+      font-weight: 900;
+      color: var(--text-primary);
     }
 
-    .menu-badge {
-      padding: var(--space-1) var(--space-2);
-      background: var(--error);
-      color: white;
-      border-radius: var(--radius-full);
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    /* 收藏列表 */
-    .favorites-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-4);
-      padding: var(--space-4) var(--space-6) var(--space-6);
-    }
-
-    .favorite-card {
-      background: var(--bg-canvas);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .favorite-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-card);
-    }
-
-    .favorite-image {
-      height: 100px;
-      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 40px;
-    }
-
-    .favorite-info {
-      padding: var(--space-3);
-    }
-
-    .favorite-name {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: var(--space-1);
-    }
-
-    .favorite-meta {
-      font-size: 12px;
-      color: var(--text-tertiary);
-    }
-
-    /* 空状态 */
     .empty-state {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: var(--space-10);
-      color: var(--text-tertiary);
+      padding: var(--space-12);
+      color: var(--text-secondary);
+      font-weight: 700;
     }
 
     .empty-icon {
-      font-size: 60px;
+      font-size: 80px;
       margin-bottom: var(--space-4);
-      opacity: 0.5;
     }
 
     .empty-text {
-      font-size: 14px;
-    }
-
-    /* 退出登录 */
-    .logout-btn {
-      width: 100%;
-      height: 48px;
-      background: var(--bg-primary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
       font-size: 15px;
-      font-weight: 600;
-      color: var(--error);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: var(--space-4);
-    }
-
-    .logout-btn:hover {
-      background: var(--error-light);
-      border-color: var(--error);
     }
   </style>
 </head>
@@ -312,134 +508,155 @@
       <span class="nav-action" id="editBtn">编辑资料</span>
     </nav>
 
-    <!-- 主内容 -->
-    <main class="main-content">
-      <!-- 用户信息卡片 -->
-      <div class="user-card">
-        <div class="user-header">
+    <!-- Web端主布局 -->
+    <div class="main-container">
+      <!-- 左侧边栏 -->
+      <aside class="sidebar">
+        <!-- 用户信息卡片 -->
+        <div class="user-card">
           <div class="user-avatar" id="userAvatar">👤</div>
-          <div class="user-info">
-            <h1 class="user-name" id="userName">加载中...</h1>
-            <div class="user-school">
-              <span>🎓</span>
-              <span id="userSchool">清华大学</span>
+          <h1 class="user-name" id="userName">加载中...</h1>
+          <div class="user-school">
+            <span>🎓</span>
+            <span id="userSchool">清华大学</span>
+          </div>
+          <div class="user-stats">
+            <div class="stat-item">
+              <div class="stat-value" id="favoritesCount">0</div>
+              <div class="stat-label">收藏</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="reviewsCount">0</div>
+              <div class="stat-label">评价</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="pointsCount">0</div>
+              <div class="stat-label">积分</div>
             </div>
           </div>
         </div>
-        <div class="user-stats">
-          <div class="stat-item">
-            <div class="stat-value" id="favoritesCount">0</div>
-            <div class="stat-label">收藏</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="reviewsCount">0</div>
-            <div class="stat-label">评价</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="pointsCount">0</div>
-            <div class="stat-label">积分</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- 我的收藏 -->
-      <div class="menu-section">
-        <div class="menu-header">
-          <span class="menu-title">❤️ 我的收藏</span>
-        </div>
-        <div class="favorites-grid" id="favoritesGrid">
-          <div class="empty-state">
-            <div class="empty-icon">🍽️</div>
-            <div class="empty-text">暂无收藏商家</div>
+        <!-- 快捷操作 -->
+        <div class="quick-actions">
+          <div class="quick-title">⚡ 快捷操作</div>
+          <div class="quick-grid">
+            <div class="quick-item" onclick="goToHistory()">
+              <div class="quick-icon">🕐</div>
+              <span class="quick-label">浏览历史</span>
+            </div>
+            <div class="quick-item" onclick="goToReviews()">
+              <div class="quick-icon">⭐</div>
+              <span class="quick-label">我的评价</span>
+            </div>
+            <div class="quick-item">
+              <div class="quick-icon">🎁</div>
+              <span class="quick-label">积分中心</span>
+            </div>
+            <div class="quick-item">
+              <div class="quick-icon">🎫</div>
+              <span class="quick-label">优惠券</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 功能菜单 -->
-      <div class="menu-section">
-        <div class="menu-header">
-          <span class="menu-title">📋 功能菜单</span>
-        </div>
-        <div class="menu-list">
-          <div class="menu-item" onclick="goToHistory()">
-            <div class="menu-icon">🕐</div>
-            <div class="menu-content">
-              <div class="menu-label">浏览历史</div>
-              <div class="menu-desc">最近查看过的商家</div>
-            </div>
-            <span class="menu-arrow">›</span>
-          </div>
-          <div class="menu-item" onclick="goToReviews()">
-            <div class="menu-icon">⭐</div>
-            <div class="menu-content">
-              <div class="menu-label">我的评价</div>
-              <div class="menu-desc">管理我的评价内容</div>
-            </div>
-            <span class="menu-arrow">›</span>
-          </div>
-          <div class="menu-item">
-            <div class="menu-icon">🎁</div>
-            <div class="menu-content">
-              <div class="menu-label">积分中心</div>
-              <div class="menu-desc">签到、任务、兑换</div>
-            </div>
-            <span class="menu-badge">NEW</span>
-          </div>
-          <div class="menu-item">
-            <div class="menu-icon">🎫</div>
-            <div class="menu-content">
-              <div class="menu-label">优惠券</div>
-              <div class="menu-desc">我的优惠券包</div>
-            </div>
-            <span class="menu-arrow">›</span>
-          </div>
-        </div>
-      </div>
+        <!-- 退出登录 -->
+        <button class="logout-btn" id="logoutBtn">退出登录</button>
+      </aside>
 
-      <!-- 设置菜单 -->
-      <div class="menu-section">
-        <div class="menu-header">
-          <span class="menu-title">⚙️ 设置</span>
-        </div>
-        <div class="menu-list">
-          <div class="menu-item">
-            <div class="menu-icon">🔔</div>
-            <div class="menu-content">
-              <div class="menu-label">消息通知</div>
-              <div class="menu-desc">管理推送通知设置</div>
-            </div>
-            <span class="menu-arrow">›</span>
+      <!-- 右侧主内容 -->
+      <main class="main-content">
+        <!-- 我的收藏 -->
+        <div class="content-section">
+          <div class="section-header">
+            <span class="section-title">❤️ 我的收藏</span>
+            <span class="section-action" onclick="goToFavorites()">查看全部 ›</span>
           </div>
-          <div class="menu-item">
-            <div class="menu-icon">🔒</div>
-            <div class="menu-content">
-              <div class="menu-label">隐私设置</div>
-              <div class="menu-desc">管理个人信息可见性</div>
+          <div class="section-body">
+            <div class="favorites-grid" id="favoritesGrid">
+              <div class="empty-state">
+                <div class="empty-icon">🍽️</div>
+                <div class="empty-text">暂无收藏商家</div>
+              </div>
             </div>
-            <span class="menu-arrow">›</span>
-          </div>
-          <div class="menu-item">
-            <div class="menu-icon">❓</div>
-            <div class="menu-content">
-              <div class="menu-label">帮助与反馈</div>
-              <div class="menu-desc">常见问题、意见反馈</div>
-            </div>
-            <span class="menu-arrow">›</span>
-          </div>
-          <div class="menu-item">
-            <div class="menu-icon">ℹ️</div>
-            <div class="menu-content">
-              <div class="menu-label">关于我们</div>
-              <div class="menu-desc">版本信息、联系方式</div>
-            </div>
-            <span class="menu-arrow">›</span>
           </div>
         </div>
-      </div>
 
-      <!-- 退出登录 -->
-      <button class="logout-btn" id="logoutBtn">退出登录</button>
-    </main>
+        <!-- 功能菜单 -->
+        <div class="content-section">
+          <div class="section-header">
+            <span class="section-title">📋 功能菜单</span>
+          </div>
+          <div class="section-body">
+            <div class="menu-grid">
+              <div class="menu-item" onclick="goToHistory()">
+                <div class="menu-icon">🕐</div>
+                <div class="menu-label">浏览历史</div>
+                <div class="menu-desc">最近查看过的商家</div>
+              </div>
+              <div class="menu-item" onclick="goToReviews()">
+                <div class="menu-icon">⭐</div>
+                <div class="menu-label">我的评价</div>
+                <div class="menu-desc">管理我的评价内容</div>
+              </div>
+              <div class="menu-item">
+                <div class="menu-icon">🎁</div>
+                <div class="menu-label">积分中心</div>
+                <div class="menu-desc">签到、任务、兑换</div>
+                <span class="menu-badge">NEW</span>
+              </div>
+              <div class="menu-item">
+                <div class="menu-icon">🎫</div>
+                <div class="menu-label">优惠券</div>
+                <div class="menu-desc">我的优惠券包</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 设置 -->
+        <div class="content-section">
+          <div class="section-header">
+            <span class="section-title">⚙️ 设置</span>
+          </div>
+          <div class="section-body">
+            <div class="settings-grid">
+              <div class="setting-item">
+                <div class="setting-icon">🔔</div>
+                <div class="setting-content">
+                  <div class="setting-label">消息通知</div>
+                  <div class="setting-desc">管理推送通知设置</div>
+                </div>
+                <span class="setting-arrow">›</span>
+              </div>
+              <div class="setting-item">
+                <div class="setting-icon">🔒</div>
+                <div class="setting-content">
+                  <div class="setting-label">隐私设置</div>
+                  <div class="setting-desc">管理个人信息可见性</div>
+                </div>
+                <span class="setting-arrow">›</span>
+              </div>
+              <div class="setting-item">
+                <div class="setting-icon">❓</div>
+                <div class="setting-content">
+                  <div class="setting-label">帮助与反馈</div>
+                  <div class="setting-desc">常见问题、意见反馈</div>
+                </div>
+                <span class="setting-arrow">›</span>
+              </div>
+              <div class="setting-item">
+                <div class="setting-icon">ℹ️</div>
+                <div class="setting-content">
+                  <div class="setting-label">关于我们</div>
+                  <div class="setting-desc">版本信息、联系方式</div>
+                </div>
+                <span class="setting-arrow">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   </div>
 
   <script>
@@ -460,7 +677,7 @@
       }
 
       try {
-        const response = await fetch(`/api/users/profile?user_id=${user.id || 1}`);
+        const response = await fetch(window.apiUrl(`/api/users/profile?user_id=${user.id || 1}`));
         const data = await response.json();
 
         if (data.code === 200) {
@@ -473,7 +690,6 @@
         }
       } catch (error) {
         console.error('加载用户信息失败:', error);
-        // 使用本地数据
         document.getElementById('userName').textContent = user.nickname || '美食探索者';
         document.getElementById('favoritesCount').textContent = '3';
         document.getElementById('reviewsCount').textContent = '5';
@@ -486,13 +702,12 @@
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       
       try {
-        const response = await fetch(`/api/users/favorites?user_id=${user.id || 1}`);
+        const response = await fetch(window.apiUrl(`/api/users/favorites?user_id=${user.id || 1}`));
         const data = await response.json();
 
         if (data.code === 200 && data.data.length > 0) {
           renderFavorites(data.data);
         } else {
-          // 使用模拟数据
           renderFavorites([
             { target_id: 6, merchant_name: '老成都火锅', review_avg_score: 4.8, price_per_person: 68 },
             { target_id: 17, merchant_name: '喜茶', review_avg_score: 4.6, price_per_person: 28 },
@@ -514,7 +729,7 @@
       
       if (favorites.length === 0) {
         container.innerHTML = `
-          <div class="empty-state">
+          <div class="empty-state" style="grid-column: 1 / -1;">
             <div class="empty-icon">🍽️</div>
             <div class="empty-text">暂无收藏商家</div>
           </div>
@@ -543,7 +758,7 @@
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           localStorage.removeItem('guestMode');
-          window.location.href = '/';
+          window.location.href = window.toPage('/');
         }
       });
 
@@ -555,11 +770,16 @@
 
     // 跳转函数
     function goHome() {
-      window.location.href = '/home';
+      window.location.href = window.toPage('/home');
     }
 
     function goToMerchant(id) {
-      window.location.href = `/merchant/${id}`;
+      window.location.href = window.toPage(`/merchant/${id}`);
+    }
+
+    function goToFavorites() {
+      // 可以跳转到专门的收藏页面
+      alert('查看全部收藏');
     }
 
     function goToHistory() {

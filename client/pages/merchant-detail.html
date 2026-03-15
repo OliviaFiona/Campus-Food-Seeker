@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1280, initial-scale=1.0">
   <title>商家详情 - 大学城美食地图</title>
-  <link rel="stylesheet" href="/styles/common.css">
+  <link rel="stylesheet" href="../styles/common.css">
+  <script src="../js/config.js"></script>
   <style>
     .detail-page {
       min-height: 100vh;
@@ -551,8 +552,8 @@
       5: { text: '休息中', class: 'closed' }
     };
 
-    // 获取商家ID
-    const merchantId = window.location.pathname.split('/').pop();
+    // 获取商家ID（支持 Express 路径 /merchant/:id 或静态页 ?id=）
+    const merchantId = window.location.pathname.split('/').pop() || new URLSearchParams(window.location.search).get('id');
     let merchantData = null;
 
     // 初始化
@@ -564,7 +565,7 @@
     // 加载商家详情
     async function loadMerchantDetail() {
       try {
-        const response = await fetch(`/api/merchants/${merchantId}`);
+        const response = await fetch(window.apiUrl(`/api/merchants/${merchantId}`));
         const data = await response.json();
 
         if (data.code === 200) {
@@ -742,7 +743,7 @@
         const text = btn.querySelector('span:last-child');
         
         try {
-          const response = await fetch('/api/users/favorites', {
+          const response = await fetch(window.apiUrl('/api/users/favorites'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ merchant_id: merchantId, action: 'add' })

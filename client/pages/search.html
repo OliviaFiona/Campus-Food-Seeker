@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1280, initial-scale=1.0">
   <title>搜索 - 大学城美食地图</title>
-  <link rel="stylesheet" href="/styles/common.css">
+  <link rel="stylesheet" href="../styles/common.css">
+  <script src="../js/config.js"></script>
   <style>
     .search-page {
       min-height: 100vh;
@@ -606,7 +607,7 @@
       document.getElementById('merchantList').innerHTML = '<div class="loading">搜索中...</div>';
 
       try {
-        const response = await fetch(`/api/merchants/search/all?keyword=${encodeURIComponent(keyword)}`);
+        const response = await fetch(window.apiUrl(`/api/merchants/search/all?keyword=${encodeURIComponent(keyword)}`));
         const data = await response.json();
 
         if (data.code === 200) {
@@ -674,7 +675,7 @@
 
     // 跳转到商家详情
     function goToMerchant(id) {
-      window.location.href = `/merchant/${id}`;
+      window.location.href = window.toPage(`/merchant/${id}`);
     }
 
     // 加载搜索历史

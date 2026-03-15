@@ -4,101 +4,86 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大学城美食地图 - 登录</title>
-  <link rel="stylesheet" href="/styles/common.css">
+  <link rel="stylesheet" href="../styles/common.css">
+  <script src="../js/config.js"></script>
   <style>
     .login-page {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      background: linear-gradient(135deg, var(--primary-50) 0%, var(--bg-secondary) 100%);
+      align-items: center;
+      background: var(--bg-primary);
+    }
+
+    .login-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
     }
 
     .login-header {
-      padding: var(--space-8) var(--space-6);
+      padding: var(--space-12) var(--space-8) var(--space-10);
       text-align: center;
-    }
-
-    .logo {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-      border-radius: var(--radius-xl);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto var(--space-4);
-      box-shadow: var(--shadow-button);
-      font-size: 40px;
     }
 
     .brand-name {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 36px;
+      font-weight: 900;
       color: var(--text-primary);
-      margin-bottom: var(--space-2);
+      margin-bottom: var(--space-4);
     }
 
     .brand-slogan {
-      font-size: 14px;
+      font-size: 18px;
       color: var(--text-secondary);
+      font-weight: 500;
     }
 
-    .login-container {
+    .login-cards {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-10);
+      max-width: 1000px;
+      width: 100%;
+      padding: 0 var(--space-8);
+      margin-top: var(--space-4);
+    }
+
+    .login-card {
       flex: 1;
       max-width: 420px;
-      width: 100%;
-      margin: 0 auto;
-      padding: var(--space-6);
-    }
-
-    .user-type-tabs {
+      min-width: 280px;
+      background: var(--bg-secondary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      box-shadow: var(--shadow-hard);
+      padding: var(--space-10);
       display: flex;
-      gap: var(--space-2);
-      background: var(--bg-canvas);
-      padding: 4px;
-      border-radius: var(--radius-lg);
-      margin-bottom: var(--space-6);
+      flex-direction: column;
+      height: auto;
     }
 
-    .user-type-tab {
-      flex: 1;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--space-2);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-      background: transparent;
+    .card-emoji {
+      font-size: 36px;
+      margin-bottom: var(--space-5);
     }
 
-    .user-type-tab.active {
-      background: var(--bg-primary);
-      color: var(--primary-500);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .user-type-tab .icon {
-      font-size: 18px;
-    }
-
-    .login-form {
-      background: var(--bg-primary);
-      padding: var(--space-8);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-card);
-    }
-
-    .form-title {
+    .card-title {
       font-size: 20px;
-      font-weight: 600;
-      margin-bottom: var(--space-6);
-      text-align: center;
+      font-weight: 900;
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: var(--space-8);
+      line-height: 1.5;
     }
 
     .form-group {
@@ -107,9 +92,9 @@
 
     .form-label {
       display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
       margin-bottom: var(--space-2);
     }
 
@@ -117,36 +102,56 @@
       position: relative;
     }
 
-    .input-icon {
-      position: absolute;
-      left: var(--space-4);
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-tertiary);
-      font-size: 18px;
-    }
-
-    .input.with-icon {
-      padding-left: 44px;
-    }
-
-    .submit-btn {
+    .login-card .input {
       width: 100%;
       height: 48px;
+      padding: 0 var(--space-4);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      font-size: 15px;
+      font-weight: 500;
+      background: var(--bg-secondary);
+    }
+
+    .login-card .submit-btn {
+      width: 100%;
+      height: 52px;
       margin-top: var(--space-4);
-      font-size: 16px;
+      font-size: 17px;
+      font-weight: 900;
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      box-shadow: var(--shadow-hard);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .login-card .submit-btn:hover {
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+
+    .login-card .submit-btn.student {
+      background: var(--accent-orange);
+      color: var(--text-inverted);
+    }
+
+    .login-card .submit-btn.merchant {
+      background: var(--accent-yellow);
+      color: var(--text-primary);
     }
 
     .form-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: var(--space-5);
-      font-size: 13px;
+      margin-top: var(--space-4);
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .form-footer a {
-      color: var(--primary-500);
+      color: var(--accent-pink);
       text-decoration: none;
     }
 
@@ -158,9 +163,10 @@
       display: flex;
       align-items: center;
       gap: var(--space-3);
-      margin: var(--space-6) 0;
+      margin: var(--space-5) 0;
       color: var(--text-tertiary);
-      font-size: 13px;
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .divider::before,
@@ -168,11 +174,41 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: var(--border);
+      background: var(--border-black);
     }
 
     .guest-btn {
       width: 100%;
+      height: 52px;
+      font-size: 16px;
+      font-weight: 900;
+      background: var(--accent-yellow);
+      color: var(--text-primary);
+      border: 2.5px solid var(--border-black);
+      border-radius: 0;
+      box-shadow: var(--shadow-hard);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .guest-btn:hover {
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+
+    .or-separator {
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-8);
+      margin-top: 13.5rem;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      flex-shrink: 0;
     }
 
     .login-footer {
@@ -180,13 +216,14 @@
       text-align: center;
       font-size: 12px;
       color: var(--text-tertiary);
+      font-weight: 500;
     }
 
     .error-message {
-      background: var(--error-light);
-      color: var(--error-dark);
+      background: #FEE2E2;
+      color: #B91C1C;
       padding: var(--space-3) var(--space-4);
-      border-radius: var(--radius-md);
+      border: 2px solid var(--border-black);
       font-size: 13px;
       margin-bottom: var(--space-4);
       display: none;
@@ -196,78 +233,70 @@
       display: block;
     }
 
-    /* 用户类型说明 */
-    .user-type-info {
-      background: var(--primary-50);
-      padding: var(--space-4);
-      border-radius: var(--radius-lg);
-      margin-bottom: var(--space-5);
-      font-size: 13px;
-      color: var(--text-secondary);
+    .remember-label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      cursor: pointer;
+      font-weight: 500;
     }
 
-    .user-type-info strong {
-      color: var(--primary-700);
+    .remember-label input {
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .login-cards {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-6);
+      }
+
+      .or-separator {
+        padding: var(--space-6) 0;
+      }
     }
   </style>
 </head>
 <body>
   <div class="login-page">
-    <header class="login-header">
-      <div class="logo">🍜</div>
-      <h1 class="brand-name">大学城美食地图</h1>
-      <p class="brand-slogan">校友吃什么，你看就知道</p>
-    </header>
+    <main class="login-main">
+      <header class="login-header">
+        <h1 class="brand-name">大学城美食地图</h1>
+        <p class="brand-slogan">校友吃什么，你看就知道</p>
+      </header>
 
-    <div class="login-container">
-      <!-- 用户类型切换 -->
-      <div class="user-type-tabs">
-        <button class="user-type-tab active" data-type="1">
-          <span class="icon">👨‍🎓</span>
-          <span>学生用户</span>
-        </button>
-        <button class="user-type-tab" data-type="2">
-          <span class="icon">🏪</span>
-          <span>商家入驻</span>
-        </button>
-      </div>
+      <div class="login-cards">
+      <!-- 学生端卡片 -->
+      <div class="login-card" id="studentCard">
+        <div class="card-emoji">👨‍🎓</div>
+        <h2 class="card-title">我是学生</h2>
+        <p class="card-desc">探索周边美食，发现校友推荐</p>
 
-      <!-- 用户类型说明 -->
-      <div class="user-type-info" id="userTypeInfo">
-        <strong>👨‍🎓 学生用户：</strong>发现周边美食，查看实时客流，分享用餐体验
-      </div>
+        <div class="error-message" id="studentError"></div>
 
-      <!-- 登录表单 -->
-      <div class="login-form">
-        <h2 class="form-title" id="formTitle">学生登录</h2>
-        
-        <div class="error-message" id="errorMessage"></div>
-
-        <form id="loginForm">
+        <form id="studentForm">
           <div class="form-group">
             <label class="form-label">手机号</label>
             <div class="input-wrapper">
-              <span class="input-icon">📱</span>
-              <input type="tel" class="input with-icon" id="phoneInput" placeholder="请输入手机号" maxlength="11" value="13800138001">
+              <input type="tel" class="input" id="phoneInput" placeholder="请输入手机号" maxlength="11" value="13800138001">
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">密码</label>
             <div class="input-wrapper">
-              <span class="input-icon">🔒</span>
-              <input type="password" class="input with-icon" id="passwordInput" placeholder="请输入密码" value="123456">
+              <input type="password" class="input" id="passwordInput" placeholder="请输入密码" value="123456">
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-lg submit-btn" id="submitBtn">
-            登 录
-          </button>
+          <button type="submit" class="submit-btn student" id="studentSubmitBtn">登 录</button>
         </form>
 
         <div class="form-footer">
-          <label class="flex items-center gap-2" style="cursor: pointer;">
-            <input type="checkbox" checked>
+          <label class="remember-label">
+            <input type="checkbox" id="rememberMe" checked>
             <span>记住我</span>
           </label>
           <a href="#">忘记密码？</a>
@@ -275,133 +304,163 @@
 
         <div class="divider">快速体验</div>
 
-        <button type="button" class="btn btn-secondary guest-btn" id="guestBtn">
-          🚀 游客模式（免登录）
+        <button type="button" class="guest-btn" id="guestBtn">
+          游客模式（免登录）
         </button>
       </div>
+
+      <div class="or-separator">— OR —</div>
+
+      <!-- 商家端卡片 -->
+      <div class="login-card" id="merchantCard">
+        <div class="card-emoji">🏪</div>
+        <h2 class="card-title">我是商家</h2>
+        <p class="card-desc">管理店铺信息，查看经营数据</p>
+
+        <div class="error-message" id="merchantError"></div>
+
+        <form id="merchantForm">
+          <div class="form-group">
+            <label class="form-label">账号</label>
+            <div class="input-wrapper">
+              <input type="text" class="input" id="merchantAccount" placeholder="请输入账号" value="13800138002">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">密码</label>
+            <div class="input-wrapper">
+              <input type="password" class="input" id="merchantPassword" placeholder="请输入密码">
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn merchant" id="merchantSubmitBtn">登录商家端</button>
+        </form>
+      </div>
     </div>
+    </main>
 
     <footer class="login-footer">
-      <p>© 2026 大学城美食地图 | 让校园生活更美味</p>
+      <p>©2026 大学城美食地图，让每一餐都有迹可循</p>
     </footer>
   </div>
 
   <script>
-    // 用户类型配置
-    const userTypeConfig = {
-      1: {
-        title: '学生登录',
-        info: '<strong>👨‍🎓 学生用户：</strong>发现周边美食，查看实时客流，分享用餐体验',
-        defaultPhone: '13800138001',
-        redirect: '/home'
-      },
-      2: {
-        title: '商家登录',
-        info: '<strong>🏪 商家入驻：</strong>管理店铺信息，更新实时状态，查看经营数据',
-        defaultPhone: '13800138002',
-        redirect: '/merchant-dashboard'
-      }
-    };
-
-    let currentUserType = 1;
-
-    // DOM元素
-    const userTypeTabs = document.querySelectorAll('.user-type-tab');
-    const userTypeInfo = document.getElementById('userTypeInfo');
-    const formTitle = document.getElementById('formTitle');
+    const studentForm = document.getElementById('studentForm');
+    const merchantForm = document.getElementById('merchantForm');
     const phoneInput = document.getElementById('phoneInput');
-    const loginForm = document.getElementById('loginForm');
-    const errorMessage = document.getElementById('errorMessage');
-    const submitBtn = document.getElementById('submitBtn');
+    const passwordInput = document.getElementById('passwordInput');
+    const studentSubmitBtn = document.getElementById('studentSubmitBtn');
+    const merchantSubmitBtn = document.getElementById('merchantSubmitBtn');
+    const studentError = document.getElementById('studentError');
+    const merchantError = document.getElementById('merchantError');
     const guestBtn = document.getElementById('guestBtn');
 
-    // 切换用户类型
-    userTypeTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const type = parseInt(tab.dataset.type);
-        currentUserType = type;
-
-        // 更新tab样式
-        userTypeTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // 更新表单信息
-        const config = userTypeConfig[type];
-        formTitle.textContent = config.title;
-        userTypeInfo.innerHTML = config.info;
-        phoneInput.value = config.defaultPhone;
-      });
-    });
-
-    // 显示错误信息
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.classList.add('show');
-      setTimeout(() => {
-        errorMessage.classList.remove('show');
-      }, 3000);
+    function showStudentError(msg) {
+      studentError.textContent = msg;
+      studentError.classList.add('show');
+      setTimeout(() => studentError.classList.remove('show'), 3000);
     }
 
-    // 登录表单提交
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    function showMerchantError(msg) {
+      merchantError.textContent = msg;
+      merchantError.classList.add('show');
+      setTimeout(() => merchantError.classList.remove('show'), 3000);
+    }
 
+    // 学生登录
+    studentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
       const phone = phoneInput.value.trim();
-      const password = document.getElementById('passwordInput').value;
+      const password = passwordInput.value;
 
       if (!phone) {
-        showError('请输入手机号');
+        showStudentError('请输入手机号');
         return;
       }
-
       if (!password) {
-        showError('请输入密码');
+        showStudentError('请输入密码');
         return;
       }
 
-      submitBtn.disabled = true;
-      submitBtn.textContent = '登录中...';
+      studentSubmitBtn.disabled = true;
+      studentSubmitBtn.textContent = '登录中...';
 
       try {
-        const response = await fetch('/api/auth/login', {
+        const res = await fetch(window.apiUrl('/api/auth/login'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, password, userType: currentUserType })
+          body: JSON.stringify({ phone, password, userType: 1 })
         });
-
-        const data = await response.json();
+        const data = await res.json();
 
         if (data.code === 200) {
-          // 保存登录信息
           localStorage.setItem('token', data.data.token);
           localStorage.setItem('user', JSON.stringify(data.data.user));
-          
-          // 跳转到对应页面
-          window.location.href = userTypeConfig[currentUserType].redirect;
+          window.location.href = window.toPage('/home');
         } else {
-          showError(data.message || '登录失败');
+          showStudentError(data.message || '登录失败');
         }
-      } catch (error) {
-        showError('网络错误，请稍后重试');
+      } catch (err) {
+        showStudentError('网络错误，请稍后重试');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = '登 录';
+        studentSubmitBtn.disabled = false;
+        studentSubmitBtn.textContent = '登 录';
+      }
+    });
+
+    // 商家登录
+    merchantForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const account = document.getElementById('merchantAccount').value.trim();
+      const password = document.getElementById('merchantPassword').value;
+
+      if (!account) {
+        showMerchantError('请输入账号');
+        return;
+      }
+      if (!password) {
+        showMerchantError('请输入密码');
+        return;
+      }
+
+      merchantSubmitBtn.disabled = true;
+      merchantSubmitBtn.textContent = '登录中...';
+
+      try {
+        const res = await fetch(window.apiUrl('/api/auth/login'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: account, password, userType: 2 })
+        });
+        const data = await res.json();
+
+        if (data.code === 200) {
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('user', JSON.stringify(data.data.user));
+          window.location.href = window.toPage('/merchant-dashboard');
+        } else {
+          showMerchantError(data.message || '登录失败');
+        }
+      } catch (err) {
+        showMerchantError('网络错误，请稍后重试');
+      } finally {
+        merchantSubmitBtn.disabled = false;
+        merchantSubmitBtn.textContent = '登录商家端';
       }
     });
 
     // 游客模式
     guestBtn.addEventListener('click', () => {
       localStorage.setItem('guestMode', 'true');
-      window.location.href = '/home';
+      window.location.href = window.toPage('/home');
     });
 
-    // 检查是否已登录
+    // 已登录则跳转
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-
     if (token && user.user_type) {
-      // 已登录，直接跳转
-      window.location.href = userTypeConfig[user.user_type]?.redirect || '/home';
+      window.location.href = window.toPage(user.user_type === 2 ? '/merchant-dashboard' : '/home');
     }
   </script>
 </body>

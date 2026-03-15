@@ -4,21 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1280, initial-scale=1.0">
   <title>大学城美食地图 - 首页</title>
-  <link rel="stylesheet" href="../styles/common.css">
-  <script src="../js/config.js"></script>
+  <link rel="stylesheet" href="/styles/common.css">
   <style>
-    /* Neo-Brutalism 2.0 - 美食地图主页 */
+    /* 页面布局 */
     .home-page {
       display: flex;
       height: 100vh;
       overflow: hidden;
     }
 
-    /* 左侧导航栏 - 黑边 选中=黑底白字+位移 */
+    /* 左侧导航栏 */
     .sidebar {
       width: 220px;
       background: var(--bg-primary);
-      border-right: 2.5px solid var(--border-black);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       z-index: 100;
@@ -26,7 +25,7 @@
 
     .sidebar-header {
       padding: var(--space-5) var(--space-5) var(--space-4);
-      border-bottom: 2.5px solid var(--border-black);
+      border-bottom: 1px solid var(--border-light);
     }
 
     .brand {
@@ -38,26 +37,24 @@
     .brand-icon {
       width: 40px;
       height: 40px;
-      background: var(--accent-orange);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
+      background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      box-shadow: var(--shadow-hard);
+      box-shadow: var(--shadow-button);
     }
 
     .brand-text {
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 700;
       color: var(--text-primary);
-      letter-spacing: -0.02em;
     }
 
     .nav-menu {
       flex: 1;
-      padding: var(--space-4) var(--space-3) var(--space-4) var(--space-1);
+      padding: var(--space-4);
       overflow-y: auto;
     }
 
@@ -66,52 +63,64 @@
     }
 
     .nav-title {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
       text-transform: uppercase;
-      letter-spacing: -0.02em;
-      padding: 0 var(--space-1);
+      letter-spacing: 0.05em;
+      padding: 0 var(--space-3);
       margin-bottom: var(--space-2);
     }
 
     .nav-item {
       display: flex;
       align-items: center;
-      gap: var(--space-1);
-      padding: var(--space-3) var(--space-2) var(--space-3) var(--space-1);
-      border-radius: 0;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
-      color: var(--text-primary);
-      font-size: 16px;
-      font-weight: 700;
-      border: 2.5px solid transparent;
-      margin-bottom: 2px;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .nav-item:hover {
-      background: var(--accent-yellow);
-      color: var(--text-primary);
+      background: var(--primary-50);
+      color: var(--primary-600);
     }
 
     .nav-item.active {
-      background: var(--border-black);
-      color: var(--text-inverted);
-      box-shadow: var(--shadow-hard);
+      background: var(--primary-50);
+      color: var(--primary-600);
     }
 
-    .nav-item.active:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
+    .nav-item .icon {
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
     }
 
-    .nav-item span {
-      flex: 1;
-      text-align: left;
-      padding-left: 1em;
+    .nav-sub-items {
+      margin-left: var(--space-8);
+      margin-top: var(--space-1);
     }
 
+    .nav-sub-item {
+      padding: var(--space-2) var(--space-3);
+      font-size: 13px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .nav-sub-item:hover {
+      color: var(--primary-600);
+      background: var(--primary-50);
+    }
+
+    /* 主内容区 */
     .main-content {
       flex: 1;
       display: flex;
@@ -120,11 +129,11 @@
       overflow: hidden;
     }
 
-    /* 顶部栏 - 米白底 3px 黑下边 Logo黑体+橙块 城市=黄底黑边 搜索=白底黑边 */
+    /* 顶部导航栏 */
     .top-nav {
       height: 64px;
       background: var(--bg-primary);
-      border-bottom: 3px solid var(--border-black);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       padding: 0 var(--space-6);
@@ -137,26 +146,15 @@
       align-items: center;
       gap: var(--space-1);
       padding: var(--space-2) var(--space-3);
-      background: var(--accent-yellow);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
-      font-weight: 700;
+      background: var(--bg-canvas);
+      border-radius: var(--radius-md);
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: var(--shadow-hard);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      transition: all 0.2s ease;
     }
 
     .location-selector:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
-    }
-
-    .location-pin-icon {
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
-      /* 浅色背景与导航栏融合，视觉上接近透明 */
-      mix-blend-mode: multiply;
+      background: var(--primary-50);
     }
 
     .search-bar {
@@ -174,55 +172,40 @@
     .icon-btn {
       width: 40px;
       height: 40px;
-      border-radius: 0;
-      border: 2.5px solid var(--border-black);
-      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
       font-size: 20px;
-      box-shadow: var(--shadow-hard);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
     .icon-btn:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
-    }
-
-    .icon-btn .nav-icon-img {
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
+      background: var(--bg-canvas);
     }
 
     .user-avatar {
       width: 36px;
       height: 36px;
-      border-radius: 0;
-      background: var(--accent-orange);
-      border: 2.5px solid var(--border-black);
-      box-shadow: var(--shadow-hard);
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--primary-400), var(--primary-500));
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-inverted);
+      color: white;
       font-size: 16px;
-      font-weight: 900;
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      border: 2px solid var(--border-light);
     }
 
-    .user-avatar:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
-    }
-
+    /* 地图容器 */
     .map-container {
       flex: 1;
       position: relative;
-      background: var(--bg-primary);
+      background: #f0f2f5;
     }
 
     #amap-container {
@@ -230,6 +213,7 @@
       height: 100%;
     }
 
+    /* 地图覆盖控件 */
     .map-overlay {
       position: absolute;
       top: var(--space-4);
@@ -239,56 +223,48 @@
 
     .filter-chips {
       display: flex;
-      gap: var(--space-4);
+      gap: var(--space-2);
       flex-wrap: wrap;
     }
 
     .filter-chip {
       display: flex;
       align-items: center;
-      padding: var(--space-3) var(--space-5);
-      background: var(--bg-secondary);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
+      gap: var(--space-1);
+      padding: var(--space-2) var(--space-3);
+      background: var(--bg-primary);
+      border-radius: var(--radius-full);
       font-size: 13px;
-      font-weight: 700;
-      box-shadow: var(--shadow-hard);
+      font-weight: 500;
+      box-shadow: var(--shadow-card);
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-light);
     }
 
-    .filter-chip:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
-    }
-
+    .filter-chip:hover,
     .filter-chip.active {
-      background: var(--border-black);
-      color: var(--text-inverted);
-      box-shadow: var(--shadow-hard);
+      background: var(--primary-500);
+      color: white;
+      border-color: var(--primary-500);
     }
 
-    .filter-chip.active:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
-    }
-
+    /* 地图图例 */
     .map-legend {
       position: absolute;
       bottom: 320px;
       left: var(--space-4);
-      background: var(--bg-secondary);
+      background: rgba(255, 255, 255, 0.95);
       padding: var(--space-4);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
-      box-shadow: var(--shadow-hard);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
       z-index: 10;
     }
 
     .legend-title {
       font-size: 12px;
-      font-weight: 900;
-      color: var(--text-primary);
+      font-weight: 600;
+      color: var(--text-secondary);
       margin-bottom: var(--space-3);
     }
 
@@ -297,39 +273,33 @@
       align-items: center;
       gap: var(--space-2);
       font-size: 12px;
-      font-weight: 700;
-      color: var(--text-primary);
+      color: var(--text-secondary);
       margin-bottom: var(--space-2);
     }
 
     .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 0;
-      border: 2px solid var(--border-black);
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
     }
 
+    /* 底部Sheet */
     .bottom-sheet {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
       background: var(--bg-primary);
-      border-top: 3px solid var(--border-black);
-      border-radius: 0;
-      box-shadow: 0 -4px 0 var(--border-black);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
       z-index: 50;
-      transition: transform 0.1s ease;
+      transition: transform 0.3s ease;
+      /* 默认收起状态，只显示handle部分 */
       transform: translateY(calc(100% - 40px));
     }
 
     .bottom-sheet.expanded {
       transform: translateY(0);
-    }
-
-    .bottom-sheet.filter-dropdown-open {
-      z-index: 9999;
-      overflow: visible;
     }
 
     .bottom-sheet-handle {
@@ -342,33 +312,20 @@
     .handle-bar {
       width: 40px;
       height: 4px;
-      background: var(--border-black);
-      border-radius: 0;
+      background: var(--border);
+      border-radius: var(--radius-full);
     }
 
     .bottom-sheet-content {
       padding: 0 var(--space-5) var(--space-5);
-      overflow: visible;
     }
 
     .sheet-filters {
-      position: relative;
-      z-index: 10;
       display: flex;
-      flex-wrap: wrap;
       gap: var(--space-3);
       margin-bottom: var(--space-4);
       padding-bottom: var(--space-4);
-      border-bottom: 2.5px solid var(--border-black);
-    }
-
-    .sheet-filter-wrap {
-      position: relative;
-      z-index: 1;
-    }
-
-    .sheet-filter-wrap.open {
-      z-index: 1000;
+      border-bottom: 1px solid var(--border-light);
     }
 
     .sheet-filter {
@@ -376,178 +333,113 @@
       align-items: center;
       gap: var(--space-1);
       padding: var(--space-2) var(--space-3);
-      background: var(--bg-secondary);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
+      background: var(--bg-canvas);
+      border-radius: var(--radius-md);
       font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
+      color: var(--text-secondary);
       cursor: pointer;
-      box-shadow: var(--shadow-hard);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
     }
 
     .sheet-filter:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
-    }
-
-    .sheet-filter.active {
-      background: var(--accent-orange);
-      color: var(--text-inverted);
-      border-color: var(--border-black);
-    }
-
-    .sheet-filter-icon-img {
-      width: 18px;
-      height: 18px;
-      object-fit: contain;
-      border: none;
-      outline: none;
-      box-shadow: none;
-    }
-
-    .sheet-filter-dropdown {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      margin-top: var(--space-1);
-      min-width: 140px;
-      max-height: 240px;
-      overflow-y: auto;
-      background: var(--bg-secondary);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
-      box-shadow: var(--shadow-hard);
-      z-index: 9999;
-      padding: var(--space-1);
-    }
-
-    .sheet-filter-wrap.open .sheet-filter-dropdown {
-      display: block;
-    }
-
-    .sheet-filter-option {
-      padding: var(--space-2) var(--space-3);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
-      cursor: pointer;
-      border-radius: 0;
-      transition: background 0.1s ease;
-    }
-
-    .sheet-filter-option:hover {
-      background: var(--accent-yellow);
-    }
-
-    .sheet-filter-option.selected {
-      background: var(--border-black);
-      color: var(--text-inverted);
+      border-color: var(--primary-300);
     }
 
     .sheet-tabs {
       display: flex;
       gap: var(--space-6);
       margin-bottom: var(--space-4);
-      position: relative;
-      z-index: 1;
     }
 
     .sheet-tab {
       font-size: 15px;
-      font-weight: 900;
-      color: var(--text-secondary);
+      font-weight: 600;
+      color: var(--text-tertiary);
       padding-bottom: var(--space-2);
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.1s ease;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
     }
 
     .sheet-tab:hover,
     .sheet-tab.active {
-      color: var(--accent-orange);
-      border-bottom-color: var(--accent-orange);
+      color: var(--primary-500);
+      border-bottom-color: var(--primary-500);
     }
 
+    /* 商家卡片流 */
     .merchant-carousel {
       display: flex;
       gap: var(--space-4);
       overflow-x: auto;
       padding-bottom: var(--space-2);
       scrollbar-width: thin;
-      scrollbar-color: var(--border-black) transparent;
-      position: relative;
-      z-index: 1;
+      scrollbar-color: var(--border) transparent;
     }
 
     .merchant-carousel::-webkit-scrollbar {
       height: 6px;
     }
 
+    .merchant-carousel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
     .merchant-carousel::-webkit-scrollbar-thumb {
-      background: var(--border-black);
+      background: var(--border);
+      border-radius: var(--radius-full);
     }
 
     .merchant-card {
       flex-shrink: 0;
-      width: 320px;
-      display: flex;
-      background: var(--bg-secondary);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
-      box-shadow: var(--shadow-hard);
+      width: 280px;
+      background: var(--bg-primary);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-card);
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      transition: all 0.2s ease;
     }
 
     .merchant-card:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
     }
 
     .merchant-card-image {
       position: relative;
-      width: 40%;
-      min-height: 100px;
-      background: var(--accent-orange);
-      border-right: 2.5px solid var(--border-black);
+      height: 140px;
+      background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
+      font-size: 48px;
     }
 
     .merchant-status-badge {
       position: absolute;
-      top: 0;
-      right: 0;
+      top: var(--space-3);
+      left: var(--space-3);
       padding: var(--space-1) var(--space-2);
-      border-radius: 0;
-      border: 2px solid var(--border-black);
-      border-top: none;
-      border-right: none;
+      border-radius: var(--radius-sm);
       font-size: 11px;
-      font-weight: 900;
-      color: var(--text-primary);
+      font-weight: 600;
+      color: white;
     }
 
-    .merchant-status-badge.idle { background: var(--accent-green); }
-    .merchant-status-badge.busy { background: var(--accent-yellow); }
-    .merchant-status-badge.full { background: var(--status-full); color: var(--text-inverted); }
-    .merchant-status-badge.queue { background: var(--accent-pink); }
+    .merchant-status-badge.idle { background: var(--status-idle); }
+    .merchant-status-badge.busy { background: var(--status-busy); }
+    .merchant-status-badge.full { background: var(--status-full); }
+    .merchant-status-badge.queue { background: var(--status-queue); }
 
     .merchant-card-content {
-      flex: 1;
-      padding: var(--space-3);
-      min-width: 0;
+      padding: var(--space-4);
     }
 
     .merchant-card-name {
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 600;
       color: var(--text-primary);
       margin-bottom: var(--space-2);
     }
@@ -557,15 +449,13 @@
       align-items: center;
       gap: var(--space-2);
       font-size: 13px;
-      font-weight: 700;
       color: var(--text-secondary);
       margin-bottom: var(--space-2);
     }
 
     .merchant-card-score {
-      color: var(--text-primary);
-      font-weight: 900;
-      font-size: 1.1em;
+      color: var(--warning);
+      font-weight: 600;
     }
 
     .merchant-card-info {
@@ -573,27 +463,26 @@
       align-items: center;
       gap: var(--space-3);
       font-size: 12px;
-      font-weight: 700;
-      color: var(--text-secondary);
+      color: var(--text-tertiary);
     }
 
     .merchant-card-queue {
-      color: var(--accent-pink);
-      font-weight: 900;
+      color: var(--status-full);
+      font-weight: 500;
     }
 
+    /* 右侧详情页 */
     .detail-panel {
       position: absolute;
       top: 64px;
       right: 0;
       width: 420px;
       bottom: 0;
-      background: var(--bg-secondary);
-      border-left: 3px solid var(--border-black);
-      box-shadow: -4px 0 0 var(--border-black);
+      background: var(--bg-primary);
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
       z-index: 80;
       transform: translateX(100%);
-      transition: transform 0.1s ease;
+      transition: transform 0.3s ease;
       overflow-y: auto;
     }
 
@@ -604,8 +493,7 @@
     .detail-header {
       position: relative;
       height: 200px;
-      background: var(--accent-orange);
-      border-bottom: 2.5px solid var(--border-black);
+      background: linear-gradient(135deg, var(--primary-200), var(--primary-300));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -618,21 +506,15 @@
       right: var(--space-4);
       width: 36px;
       height: 36px;
-      background: var(--bg-secondary);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-full);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-size: 18px;
-      box-shadow: var(--shadow-hard);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-    }
-
-    .detail-close:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
+      border: none;
+      box-shadow: var(--shadow-card);
     }
 
     .detail-favorite {
@@ -641,21 +523,15 @@
       right: 60px;
       width: 36px;
       height: 36px;
-      background: var(--bg-secondary);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-full);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-size: 18px;
-      box-shadow: var(--shadow-hard);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-    }
-
-    .detail-favorite:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
+      border: none;
+      box-shadow: var(--shadow-card);
     }
 
     .detail-content {
@@ -664,7 +540,7 @@
 
     .detail-name {
       font-size: 22px;
-      font-weight: 900;
+      font-weight: 700;
       color: var(--text-primary);
       margin-bottom: var(--space-3);
     }
@@ -682,7 +558,6 @@
       align-items: center;
       gap: var(--space-1);
       font-size: 14px;
-      font-weight: 700;
       color: var(--text-secondary);
     }
 
@@ -691,17 +566,16 @@
       align-items: center;
       gap: var(--space-2);
       padding: var(--space-2) var(--space-3);
-      border-radius: 0;
-      border: 2px solid var(--border-black);
+      border-radius: var(--radius-md);
       font-size: 13px;
-      font-weight: 900;
+      font-weight: 600;
       margin-bottom: var(--space-4);
     }
 
-    .detail-status.idle { background: var(--accent-green); color: var(--text-primary); }
-    .detail-status.busy { background: var(--accent-yellow); color: var(--text-primary); }
-    .detail-status.full { background: var(--status-full); color: var(--text-inverted); }
-    .detail-status.queue { background: var(--accent-pink); color: var(--text-primary); }
+    .detail-status.idle { background: var(--success-light); color: var(--success); }
+    .detail-status.busy { background: var(--warning-light); color: var(--warning-dark); }
+    .detail-status.full { background: var(--error-light); color: var(--error-dark); }
+    .detail-status.queue { background: #F3E8FF; color: #7C3AED; }
 
     .detail-actions {
       display: flex;
@@ -716,34 +590,28 @@
       align-items: center;
       justify-content: center;
       gap: var(--space-2);
-      border-radius: 0;
+      border-radius: var(--radius-lg);
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
-      border: 2.5px solid var(--border-black);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      transition: all 0.2s ease;
+      border: none;
     }
 
     .detail-action-btn.primary {
-      background: var(--accent-orange);
-      color: var(--text-inverted);
-      box-shadow: var(--shadow-hard);
+      background: var(--primary-500);
+      color: white;
+      box-shadow: var(--shadow-button);
     }
 
     .detail-action-btn.primary:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
+      background: var(--primary-600);
     }
 
     .detail-action-btn.secondary {
-      background: var(--accent-yellow);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-hard);
-    }
-
-    .detail-action-btn.secondary:hover {
-      box-shadow: none;
-      transform: translate(2px, 2px);
+      background: var(--bg-canvas);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
     }
 
     .detail-section {
@@ -752,7 +620,7 @@
 
     .detail-section-title {
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 600;
       color: var(--text-primary);
       margin-bottom: var(--space-3);
     }
@@ -765,12 +633,10 @@
 
     .detail-tag {
       padding: var(--space-1) var(--space-3);
-      background: var(--accent-yellow);
-      border: 2px solid var(--border-black);
-      border-radius: 0;
+      background: var(--bg-canvas);
+      border-radius: var(--radius-full);
       font-size: 12px;
-      font-weight: 700;
-      color: var(--text-primary);
+      color: var(--text-secondary);
     }
 
     .detail-address {
@@ -778,21 +644,20 @@
       align-items: flex-start;
       gap: var(--space-2);
       font-size: 14px;
-      font-weight: 700;
       color: var(--text-secondary);
       padding: var(--space-3);
-      background: var(--bg-primary);
-      border: 2.5px solid var(--border-black);
-      border-radius: 0;
+      background: var(--bg-canvas);
+      border-radius: var(--radius-lg);
     }
 
+    /* 加载状态 */
     .loading-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: var(--bg-primary);
+      background: rgba(255, 255, 255, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -802,19 +667,14 @@
     .loading-spinner {
       width: 48px;
       height: 48px;
-      background: repeating-linear-gradient(
-        90deg,
-        var(--border-black),
-        var(--border-black) 4px,
-        var(--bg-secondary) 4px,
-        var(--bg-secondary) 8px
-      );
-      border: 2.5px solid var(--border-black);
-      animation: loadingStripes 0.6s steps(2) infinite;
+      border: 4px solid var(--primary-100);
+      border-top-color: var(--primary-500);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    @keyframes loadingStripes {
-      to { transform: translateX(8px); }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -833,19 +693,27 @@
         <div class="nav-section">
           <div class="nav-title">探索</div>
           <div class="nav-item active" data-filter="nearby">
+            <span class="icon">📍</span>
             <span>附近美食</span>
           </div>
           <div class="nav-item" data-filter="hot">
+            <span class="icon">🔥</span>
             <span>热门推荐</span>
+          </div>
+          <div class="nav-sub-items" id="hotSubItems" style="display: none;">
+            <div class="nav-sub-item" data-filter="hot-today">📈 今日热榜</div>
+            <div class="nav-sub-item" data-filter="hot-week">🏆 本周排行</div>
           </div>
         </div>
 
         <div class="nav-section">
           <div class="nav-title">我的</div>
           <div class="nav-item" data-filter="favorites">
+            <span class="icon">❤️</span>
             <span>我的收藏</span>
           </div>
           <div class="nav-item" data-page="profile">
+            <span class="icon">👤</span>
             <span>个人中心</span>
           </div>
         </div>
@@ -853,15 +721,19 @@
         <div class="nav-section">
           <div class="nav-title">场景</div>
           <div class="nav-item" data-filter="scene-fast">
+            <span class="icon">⚡</span>
             <span>课间快吃</span>
           </div>
           <div class="nav-item" data-filter="scene-gather">
+            <span class="icon">🎉</span>
             <span>宿舍聚餐</span>
           </div>
           <div class="nav-item" data-filter="scene-date">
+            <span class="icon">💕</span>
             <span>约会用餐</span>
           </div>
           <div class="nav-item" data-filter="scene-night">
+            <span class="icon">🌙</span>
             <span>深夜食堂</span>
           </div>
         </div>
@@ -873,7 +745,7 @@
       <!-- 顶部导航栏 -->
       <header class="top-nav">
         <div class="location-selector">
-          <img src="../assets/images/location-pin-icon.png" alt="定位" class="location-pin-icon">
+          <span>📍</span>
           <span id="currentCity">北京</span>
           <span>▼</span>
         </div>
@@ -886,7 +758,7 @@
         </div>
 
         <div class="top-nav-actions">
-          <button class="icon-btn" title="消息"><img src="../assets/images/message-icon.png" alt="消息" class="nav-icon-img"></button>
+          <button class="icon-btn" title="消息">🔔</button>
           <div class="user-avatar" id="userAvatar">👤</div>
         </div>
       </header>
@@ -899,11 +771,11 @@
         <div class="map-overlay">
           <div class="filter-chips">
             <div class="filter-chip active" data-type="all">全部</div>
-            <div class="filter-chip" data-type="1">快餐</div>
-            <div class="filter-chip" data-type="2">饮品</div>
-            <div class="filter-chip" data-type="3">甜品</div>
-            <div class="filter-chip" data-type="4">小吃</div>
-            <div class="filter-chip" data-type="5">正餐</div>
+            <div class="filter-chip" data-type="1">🍔 快餐</div>
+            <div class="filter-chip" data-type="2">☕ 饮品</div>
+            <div class="filter-chip" data-type="3">🍰 甜品</div>
+            <div class="filter-chip" data-type="4">🍜 小吃</div>
+            <div class="filter-chip" data-type="5">🍽️ 正餐</div>
           </div>
         </div>
 
@@ -936,39 +808,27 @@
         </div>
         
         <div class="bottom-sheet-content">
-          <!-- 筛选器（价格、距离、类型带二级子标签） -->
+          <!-- 筛选器 -->
           <div class="sheet-filters">
-            <div class="sheet-filter-wrap" data-filter="price">
-              <div class="sheet-filter" id="sheetFilterPrice">
-                <span>💰</span>
-                <span class="sheet-filter-label">价格</span>
-                <span>▼</span>
-              </div>
-              <div class="sheet-filter-dropdown" id="filterDropdownPrice"></div>
+            <div class="sheet-filter">
+              <span>💰</span>
+              <span>价格</span>
+              <span>▼</span>
             </div>
-            <div class="sheet-filter-wrap" data-filter="distance">
-              <div class="sheet-filter" id="sheetFilterDistance">
-                <img src="../assets/images/location-pin-icon.png" alt="距离" class="sheet-filter-icon-img">
-                <span class="sheet-filter-label">距离</span>
-                <span>▼</span>
-              </div>
-              <div class="sheet-filter-dropdown" id="filterDropdownDistance"></div>
+            <div class="sheet-filter">
+              <span>📏</span>
+              <span>距离</span>
+              <span>▼</span>
             </div>
-            <div class="sheet-filter-wrap" data-filter="type">
-              <div class="sheet-filter" id="sheetFilterType">
-                <span>🏷️</span>
-                <span class="sheet-filter-label">类型</span>
-                <span>▼</span>
-              </div>
-              <div class="sheet-filter-dropdown" id="filterDropdownType"></div>
+            <div class="sheet-filter">
+              <span>🏷️</span>
+              <span>类型</span>
+              <span>▼</span>
             </div>
-            <div class="sheet-filter-wrap" data-filter="sort">
-              <div class="sheet-filter" id="sheetFilterSort">
-                <img src="../assets/images/sort-icon.png" alt="排序" class="sheet-filter-icon-img">
-                <span class="sheet-filter-label">排序</span>
-                <span>▼</span>
-              </div>
-              <div class="sheet-filter-dropdown" id="filterDropdownSort"></div>
+            <div class="sheet-filter">
+              <span>⚡</span>
+              <span>排序</span>
+              <span>▼</span>
             </div>
           </div>
 
@@ -1006,7 +866,7 @@
   </div>
 
   <!-- 高德地图API -->
-  <script src="https://webapi.amap.com/maps?v=2.0&key=3f16fa887b9d5a41706e075450a7976c"></script>
-  <script src="../js/home.js"></script>
+  <script src="https://webapi.amap.com/maps?v=2.0&key=AAA"></script>
+  <script src="/js/home.js"></script>
 </body>
 </html>
